@@ -146,7 +146,7 @@ a{color:inherit;text-decoration:none;}
   <section class="step active" data-step="1">
     <h2>קצת עליך</h2>
     <p class="sub">נתחיל בבסיס — זה קובע את נקודת הזיכוי הראשונה שלך.</p>
-    <div class="fld"><label for="fName">שם מלא <span style="color:var(--fg-dim);font-weight:400;">(לא חובה)</span></label><input type="text" id="fName" placeholder="ישראל ישראלי"></div>
+    <div class="fld"><label for="fName">שם מלא</label><input type="text" id="fName" placeholder="לדוגמה: ליאור כהן" oninput="persist()"></div>
     <div class="fld">
       <label>מין</label>
       <div class="opts cols-2">
@@ -154,7 +154,7 @@ a{color:inherit;text-decoration:none;}
         <label class="opt"><input type="radio" name="gender" value="female" onchange="calc()"><span class="box"><span class="emoji">👩</span><span class="t">אישה <small style="color:var(--accent);">+0.5 נק׳</small></span></span></label>
       </div>
     </div>
-    <div class="fld"><label for="fBirth">שנת לידה</label><input type="number" id="fBirth" class="num-in" inputmode="numeric" min="1940" max="2010" placeholder="1990"></div>
+    <div class="fld"><label for="fBirth">שנת לידה</label><input type="number" id="fBirth" class="num-in" inputmode="numeric" min="1940" max="2010" placeholder="1990" oninput="persist()"></div>
   </section>
 
   <!-- STEP 2 — Family status -->
@@ -215,14 +215,14 @@ a{color:inherit;text-decoration:none;}
     <div class="fld">
       <label>סוג עוסק</label>
       <div class="opts cols-2">
-        <label class="opt"><input type="radio" name="biz" value="osek_patur" checked><span class="box"><span class="t">עוסק פטור</span></span></label>
-        <label class="opt"><input type="radio" name="biz" value="osek_morshe"><span class="box"><span class="t">עוסק מורשה</span></span></label>
+        <label class="opt"><input type="radio" name="biz" value="osek_patur" checked onchange="persist()"><span class="box"><span class="t">עוסק פטור</span></span></label>
+        <label class="opt"><input type="radio" name="biz" value="osek_morshe" onchange="persist()"><span class="box"><span class="t">עוסק מורשה</span></span></label>
       </div>
     </div>
     <div class="fld"><label for="profession">מקצוע</label>
-      <select id="profession"><option value="">בחר מקצוע…</option></select>
+      <select id="profession" onchange="persist()"><option value="">בחר מקצוע…</option></select>
     </div>
-    <div class="fld"><label for="advRate">שיעור מקדמת מס הכנסה <span style="color:var(--fg-dim);font-weight:400;">%</span></label><input type="number" id="advRate" class="num-in" inputmode="numeric" min="0" max="100" step="0.5" value="10"></div>
+    <div class="fld"><label for="advRate">שיעור מקדמת מס הכנסה <span style="color:var(--fg-dim);font-weight:400;">%</span></label><input type="number" id="advRate" class="num-in" inputmode="numeric" min="0" max="100" step="0.5" value="10" oninput="persist()"></div>
   </section>
 
   <!-- RESULT -->
@@ -344,6 +344,7 @@ function calc(){
   var html = rows.map(function(r){ return '<div class="brk-line"><span class="k">'+r[0]+'</span><span class="v num">+'+r[1].toFixed(2)+'</span></div>'; }).join('');
   html += '<div class="brk-line total"><span class="k">סה״כ נקודות זיכוי</span><span class="v num">'+b.total.toFixed(2)+'</span></div>';
   var bd=document.getElementById('rBreakdown'); if(bd) bd.innerHTML=html;
+  persist(); // auto-save on every change
 }
 
 function onMarital(){
@@ -432,9 +433,28 @@ function go(d){
   if(n>TOTAL){ calc(); persist(); }
   show(n);
 }
+function professionLabel(){
+  var sel=document.getElementById('profession');
+  if(sel && sel.selectedIndex>0){
+    // strip leading emoji for a clean name
+    return sel.options[sel.selectedIndex].text.replace(/^[^\u0590-\u05FFa-zA-Z]+/,'').trim();
+  }
+  return '';
+}
 function persist(){
   try{
-    var data={ points:computeBreakdown().total, gender:radio('gender'), biz:radio('biz'), profession:val('profession'), advRate:val('advRate') };
+    var data={
+      name: val('fName'),
+      birthYear: val('fBirth'),
+      gender: radio('gender'),
+      marital: radio('marital'),
+      biz: radio('biz'),
+      profession: val('profession'),
+      professionLabel: professionLabel(),
+      advRate: val('advRate'),
+      points: computeBreakdown().total,
+      updatedAt: Date.now()
+    };
     localStorage.setItem('taxil-profile', JSON.stringify(data));
   }catch(e){}
 }
@@ -442,8 +462,24 @@ function persist(){
 /* theme inherit from main site */
 (function(){ try{ var t=localStorage.getItem('taxil-theme'); if(t) document.documentElement.setAttribute('data-theme',t);}catch(e){} })();
 
+/* restore saved profile if returning */
+(function restore(){
+  var p; try{ p=JSON.parse(localStorage.getItem('taxil-profile')); }catch(e){}
+  if(!p) return;
+  if(p.name) document.getElementById('fName').value=p.name;
+  if(p.birthYear) document.getElementById('fBirth').value=p.birthYear;
+  if(p.gender){ var g=document.querySelector('input[name="gender"][value="'+p.gender+'"]'); if(g) g.checked=true; }
+  if(p.marital){ var m=document.querySelector('input[name="marital"][value="'+p.marital+'"]'); if(m) m.checked=true; }
+  if(p.biz){ var b=document.querySelector('input[name="biz"][value="'+p.biz+'"]'); if(b) b.checked=true; }
+  if(p.advRate) document.getElementById('advRate').value=p.advRate;
+  // profession set after list is built
+  window._restoreProf = p.profession || '';
+})();
+
 buildProg();
 addChild();
+if(window._restoreProf){ var sel=document.getElementById('profession'); if(sel) sel.value=window._restoreProf; }
+onMarital();
 calc();
 </script>
 </body>

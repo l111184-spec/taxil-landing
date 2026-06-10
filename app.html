@@ -291,9 +291,15 @@ function loadProfile(){ try{ return JSON.parse(localStorage.getItem("taxil-profi
 function renderProfile(){
   var t=document.getElementById('profText');
   if(profile){
+    var name = (profile.name||'').trim();
+    var prof = (profile.professionLabel||'').trim();
     var biz = profile.biz==='osek_morshe' ? 'עוסק מורשה' : 'עוסק פטור';
-    var pts = (profile.points!=null) ? profile.points.toFixed(2)+' נק׳ זיכוי' : '';
-    t.textContent = biz + (pts? ' · '+pts : '');
+    var head = name ? ('שלום ' + name) : 'הפרופיל שלך';
+    var subParts = [];
+    if(prof) subParts.push(prof);
+    subParts.push(biz);
+    if(profile.points!=null) subParts.push(profile.points.toFixed(2)+' נק׳');
+    t.innerHTML = '<b style="color:var(--fg);font-weight:700;">'+head+'</b> · '+subParts.join(' · ');
   } else {
     t.textContent = 'לא מולא פרופיל — מלא כדי לדייק את המס';
   }
