@@ -182,6 +182,7 @@ a{color:inherit;text-decoration:none;}
     <div class="lbl">סה״כ לתשלום בחשבון הבא</div>
     <div class="amt num" id="heroTotal">₪0</div>
     <div class="note">מע״מ + מס הכנסה + ביטוח לאומי · לפי חוקי 2026</div>
+    <div class="note" id="annNote" style="margin-top:6px;color:var(--fg-muted);"></div>
   </div>
 
   <div class="grid3">
@@ -217,7 +218,19 @@ a{color:inherit;text-decoration:none;}
     </div>
   </div>
 
-  <p class="disc">Taxil מספקת חישוב מקורב למטרות תכנון בלבד. הנתונים נשמרים מקומית במכשיר זה. לחישוב סופי ולדיווח רשמי יש להיוועץ ברואה חשבון מוסמך.</p>
+  <!-- close period -->
+  <button class="btn btn-ghost btn-block" onclick="closePeriod()" style="margin-bottom:16px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    סגור תקופה והתחל חדשה</button>
+
+  <!-- history -->
+  <div class="card" id="histCard" style="display:none;">
+    <h2><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><line x1="12" y1="7" x2="12" y2="12"/><line x1="12" y1="12" x2="15" y2="15"/></svg> תקופות קודמות השנה</span></h2>
+    <div class="grid3" id="ytdSummary" style="margin-bottom:14px;"></div>
+    <div class="inv-list" id="histList"></div>
+  </div>
+
+  <p class="disc">Taxil מספקת חישוב מקורב למטרות תכנון בלבד. המס מחושב לפי קצב שנתי מתכייל — כל תקופה שתסגור מדייקת את התחזית. הנתונים נשמרים מקומית במכשיר זה. לחישוב סופי ולדיווח רשמי — רואה חשבון מוסמך.</p>
 </main>
 
 <button class="fab" onclick="openModal('manual')">
@@ -281,9 +294,19 @@ function progressive(t){ var x=0; for(var i=0;i<BRACKETS.length;i++){var f=BRACK
 function ils(n){ return "₪"+Math.round(n||0).toLocaleString("en-US"); }
 
 /* ---- state (persisted) ---- */
-var KEY="taxil-data-v1";
-var state = load() || { period:"bimonthly", revenue:0, invoices:[] };
+var KEY="taxil-data-v2";
+var state = migrate(load()) || { period:"bimonthly", revenue:0, invoices:[], closedPeriods:[] };
 var profile = loadProfile();
+
+function migrate(s){
+  if(!s) {
+    // try to import old v1
+    try{ var old=JSON.parse(localStorage.getItem('taxil-data-v1')); if(old){ old.closedPeriods=old.closedPeriods||[]; return old; } }catch(e){}
+    return null;
+  }
+  if(!s.closedPeriods) s.closedPeriods=[];
+  return s;
+}
 
 function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
@@ -310,27 +333,60 @@ function isMorshe(){ return profile && profile.biz==='osek_morshe'; }
 function creditPoints(){ return (profile && profile.points!=null) ? profile.points : 2.25; }
 function advRate(){ return (profile && profile.advRate) ? parseFloat(profile.advRate)||0 : 0; }
 
-/* ---- compute ---- */
-function compute(){
+/* ---- net helpers for current period ---- */
+function currentPeriodNets(){
   var morshe = isMorshe();
   var pm = state.period==='monthly' ? 1 : 2;
   var revenue = Math.max(0, state.revenue||0);
   var expGross = state.invoices.reduce(function(s,x){ return s + (parseFloat(x.total)||0); },0);
-
   var vatIn=0, expNet=0;
   if(morshe){ var net=expGross/(1+VAT_RATE); vatIn=expGross-net; expNet=net; }
   else { expNet=expGross; }
   var revNet = morshe ? revenue/(1+VAT_RATE) : revenue;
   var vatOut = morshe ? revenue-revNet : 0;
   var vatPay = morshe ? vatOut-vatIn : 0;
-  var taxable = Math.max(0, revNet-expNet);
-  var ann = taxable*(12/pm);
-  var git = progressive(ann)*(pm/12);
-  var cd = creditPoints()*CPV*(pm/12);
-  var nit = Math.max(0, git-cd);
-  var bl = bituach(ann)*(pm/12);
+  return { months:pm, revNet:revNet, expNet:expNet, taxable:Math.max(0,revNet-expNet), vatPay:vatPay, expGross:expGross, morshe:morshe };
+}
+
+/* ---- CUMULATIVE compute ----
+   Annualize from YTD income over months elapsed, compute annual income tax + NI,
+   take the YTD share, then subtract what was already charged in closed periods.
+*/
+function compute(){
+  var cur = currentPeriodNets();
+  var closed = state.closedPeriods || [];
+
+  // sums BEFORE this period (closed periods only)
+  var prevMonths=0, prevTaxable=0, prevTaxPaid=0, prevBlPaid=0;
+  closed.forEach(function(p){ prevMonths+=p.months; prevTaxable+=p.taxable; prevTaxPaid+=(p.nit||0); prevBlPaid+=(p.bl||0); });
+
+  // cumulative incl. current
+  var totMonths = prevMonths + cur.months;
+  var totTaxable = prevTaxable + cur.taxable;
+
+  // annualized run-rate from everything known so far
+  var annTaxable = totMonths>0 ? totTaxable*(12/totMonths) : 0;
+
+  // ----- income tax (cumulative) -----
+  var annGrossTax = progressive(annTaxable);
+  var annCredit = creditPoints()*CPV;
+  var annNetTax = Math.max(0, annGrossTax - annCredit);
+  // YTD tax = annual * (monthsElapsed/12); this-period = YTD - alreadyPaid
+  var ytdTax = annNetTax * (totMonths/12);
+  var nit = Math.max(0, ytdTax - prevTaxPaid);
+
+  // ----- bituach leumi (cumulative, tiered) -----
+  var annBl = bituach(annTaxable);
+  var ytdBl = annBl * (totMonths/12);
+  var bl = Math.max(0, ytdBl - prevBlPaid);
+
+  // ----- VAT is per-period (not annualized) -----
+  var vatPay = cur.vatPay;
+
   var total = Math.max(0,vatPay)+nit+bl;
-  return { vatPay:vatPay, nit:nit, bl:bl, total:total, expGross:expGross, morshe:morshe };
+  return { vatPay:vatPay, nit:nit, bl:bl, total:total, expGross:cur.expGross, morshe:cur.morshe,
+           taxable:cur.taxable, months:cur.months, annTaxable:annTaxable, totMonths:totMonths,
+           prevMonths:prevMonths };
 }
 
 function render(){
@@ -341,6 +397,16 @@ function render(){
   document.getElementById('mBituach').textContent = ils(c.bl);
   document.getElementById('expSum').textContent = ils(c.expGross);
   document.getElementById('revLbl').textContent = c.morshe ? 'מחזור (כולל מע״מ)' : 'מחזור (פטור ממע״מ)';
+  // cumulative annual-rate note
+  var note=document.getElementById('annNote');
+  if(note){
+    if(c.prevMonths>0){
+      note.innerHTML = 'מחושב לפי קצב שנתי של <b>'+ils(c.annTaxable)+'</b> (מ‑'+c.totMonths+' חודשים שכבר הוזנו השנה)';
+    } else {
+      note.innerHTML = 'מחושב לפי קצב שנתי משוער של <b>'+ils(c.annTaxable)+'</b> · יתעדכן כשתסגור תקופות';
+    }
+  }
+  renderHistory();
   // invoices
   var list=document.getElementById('invList'), empty=document.getElementById('invEmpty');
   if(state.invoices.length===0){ empty.style.display='block'; list.innerHTML=''; }
@@ -366,6 +432,50 @@ function setPeriod(p){
 }
 function onRevenue(){ state.revenue = parseFloat(document.getElementById('revenue').value)||0; save(); render(); }
 function rmInv(i){ state.invoices.splice(i,1); save(); render(); toast('חשבונית נמחקה'); }
+
+/* ---- close current period → push to history, reset current ---- */
+function closePeriod(){
+  var cur=currentPeriodNets();
+  if(cur.revNet<=0){ toast('הזן מחזור לפני סגירת תקופה'); return; }
+  var c=compute(); // values for THIS period given cumulative context
+  var label = new Date().toLocaleDateString('he-IL',{month:'short',year:'numeric'});
+  state.closedPeriods.push({
+    label: label,
+    months: cur.months,
+    revNet: Math.round(cur.revNet),
+    taxable: cur.taxable,
+    vatPay: Math.round(Math.max(0,cur.vatPay)),
+    nit: c.nit,
+    bl: c.bl,
+    total: c.total,
+    closedAt: Date.now()
+  });
+  // reset current period
+  state.revenue=0; state.invoices=[];
+  document.getElementById('revenue').value='';
+  save(); render(); toast('✓ התקופה נסגרה ונשמרה');
+}
+function rmPeriod(i){ if(!confirm('למחוק תקופה זו מההיסטוריה?')) return; state.closedPeriods.splice(i,1); save(); render(); toast('תקופה נמחקה'); }
+
+function renderHistory(){
+  var wrap=document.getElementById('histCard'); if(!wrap) return;
+  var ps=state.closedPeriods||[];
+  if(ps.length===0){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  var ytdTax=0, ytdBl=0, ytdVat=0, ytdRev=0, ytdMonths=0;
+  ps.forEach(function(p){ ytdTax+=p.nit||0; ytdBl+=p.bl||0; ytdVat+=p.vatPay||0; ytdRev+=p.revNet||0; ytdMonths+=p.months||0; });
+  var rows = ps.map(function(p,i){
+    return '<div class="inv"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>'+
+      '<div class="meta"><div class="t">'+p.label+' · '+p.months+' חודשים</div><div class="s">מחזור נטו '+ils(p.revNet)+'</div></div>'+
+      '<div class="amt num">'+ils(p.total)+'<small>שולם</small></div>'+
+      '<button class="rm" onclick="rmPeriod('+i+')" aria-label="מחק"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></div>';
+  }).join('');
+  document.getElementById('histList').innerHTML=rows;
+  document.getElementById('ytdSummary').innerHTML =
+    '<div class="mini"><div class="k">שולם השנה (מס+ביטוח)</div><div class="v num">'+ils(ytdTax+ytdBl)+'</div></div>'+
+    '<div class="mini"><div class="k">מע״מ ששולם</div><div class="v num">'+ils(ytdVat)+'</div></div>'+
+    '<div class="mini"><div class="k">חודשים השנה</div><div class="v num">'+ytdMonths+'</div></div>';
+}
 
 /* ---- modals ---- */
 function openModal(which){
