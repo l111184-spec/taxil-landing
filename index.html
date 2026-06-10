@@ -876,8 +876,8 @@ var OCR_ENDPOINT = "https://laugh-placed-confirmed-ranks.trycloudflare.com/api/o
 var VAT_RATE = 0.18, CREDIT_POINT_VALUE = 2976;
 var BRACKETS = [[0,84120,0.10],[84120,120720,0.14],[120720,228000,0.20],[228000,301200,0.31],[301200,560280,0.35],[560280,721560,0.47],[721560,null,0.50]];
 // Bituach Leumi tiers (annual amounts)
-var BL_LOW_CEIL = 90264;        // ~60% of avg wage, annual
-var BL_TOP_CEIL = 608400;       // contributions ceiling, annual (~₪50,695/mo)
+var BL_LOW_CEIL = 99144;        // 60% of 2026 avg wage ₪13,770/mo → ₪8,262/mo × 12
+var BL_TOP_CEIL = 826200;       // contributions ceiling = 5× avg wage ₪68,850/mo × 12
 var BL_RATE_LOW = 0.0597;
 var BL_RATE_HIGH = 0.1783;
 function calcBituachLeumi(annualTaxable){

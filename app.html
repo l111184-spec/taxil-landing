@@ -273,7 +273,9 @@ a{color:inherit;text-decoration:none;}
 var OCR_ENDPOINT = "https://laugh-placed-confirmed-ranks.trycloudflare.com/api/ocr";
 var VAT_RATE=0.18, CPV=2976;
 var BRACKETS=[[0,84120,.10],[84120,120720,.14],[120720,228000,.20],[228000,301200,.31],[301200,560280,.35],[560280,721560,.47],[721560,null,.50]];
-var BL_LOW=90264, BL_TOP=608400, BL_RL=0.0597, BL_RH=0.1783;
+/* Bituach Leumi 2026 — avg wage ₪13,770/mo (official btl.gov.il).
+   Low tier up to 60% (₪8,262/mo = ₪99,144/yr) = 5.97%; above to ceiling (5× avg = ₪826,200/yr) = 17.83%. */
+var BL_LOW=99144, BL_TOP=826200, BL_RL=0.0597, BL_RH=0.1783;
 function bituach(a){ if(a<=0)return 0; var lo=Math.min(a,BL_LOW)*BL_RL; var hi=a>BL_LOW?(Math.min(a,BL_TOP)-BL_LOW)*BL_RH:0; return lo+hi; }
 function progressive(t){ var x=0; for(var i=0;i<BRACKETS.length;i++){var f=BRACKETS[i][0],to=BRACKETS[i][1],r=BRACKETS[i][2]; if(t<=f)break; var u=to===null?t:Math.min(t,to); x+=(u-f)*r; if(to===null)break;} return x; }
 function ils(n){ return "₪"+Math.round(n||0).toLocaleString("en-US"); }
