@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Taxil — רואה החשבון האוטומטי לעצמאי הישראלי | מחשבון מס 2026</title>
-<meta name="description" content="צלם חשבונית וה-AI מסווג, מחשב מע״מ ומס הכנסה לפי חוקי 2026 ומכין דיווח. כולל מחשבון מס חינמי לעצמאי ופרילנסר בישראל — עוסק פטור ומורשה, נקודות זיכוי, מקדמות וביטוח לאומי." />
+<title>Taxil — תדע בכל רגע כמה מע״מ ומס אתה חייב | מעקב מס לעצמאי</title>
+<meta name="description" content="Taxil מראה לעצמאי הישראלי בכל רגע כמה מע״מ, מס הכנסה וביטוח לאומי יצאו בחשבון הדו-חודשי הבא — בלי הפתעות. מחשבון מע״מ ומס חינמי לפי חוקי 2026, כולל תכנון מע״מ." />
 <meta name="keywords" content="מחשבון מס, מס הכנסה עצמאי, מע״מ עוסק מורשה, עוסק פטור, ניהול הוצאות, חשבוניות, נקודות זיכוי, מקדמות מס, ביטוח לאומי, רואה חשבון לעצמאי" />
 <link rel="canonical" href="https://taxil.co.il/" />
 <meta name="robots" content="index, follow" />
@@ -264,6 +264,16 @@ header.nav { position:sticky; top:0; z-index:50; backdrop-filter:blur(16px) satu
 .res-line .v.neg { color:var(--danger); }
 .calc-note { font-size:12.5px; color:var(--fg-dim); margin-top:16px; line-height:1.55; display:flex; gap:8px; }
 .calc-note svg { width:16px; height:16px; flex-shrink:0; margin-top:2px; color:var(--warn); }
+.planner { margin-top:8px; margin-bottom:16px; padding:18px; background:linear-gradient(135deg,rgba(47,230,168,.07),var(--bg)); border:1px solid var(--accent-deep); border-radius:14px; }
+.planner-head { margin-bottom:12px; }
+.planner-t { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; color:var(--fg); }
+.planner-t svg { width:17px; height:17px; color:var(--accent); }
+.planner input[type=range] { width:100%; accent-color:var(--accent); height:6px; cursor:pointer; }
+.planner-row { display:flex; align-items:center; justify-content:space-between; margin-top:10px; font-size:13.5px; color:var(--fg-muted); }
+.planner-row b { color:var(--fg); }
+.planner-save { font-weight:700; color:var(--accent); }
+.sync-note { display:flex; align-items:center; gap:9px; margin-top:14px; padding:11px 14px; background:var(--bg); border:1px dashed var(--border); border-radius:11px; font-size:12.5px; color:var(--fg-dim); }
+.sync-note svg { width:16px; height:16px; flex-shrink:0; color:var(--accent); }
 .calc-cta { margin-top:18px; }
 
 /* ---- comparison ---- */
@@ -385,7 +395,7 @@ footer.foot { border-top:1px solid var(--border-soft); padding:54px 0 36px; marg
     <nav class="nav-links" id="navLinks" aria-label="ניווט ראשי">
       <a class="lnk" href="#features">יכולות</a>
       <a class="lnk" href="#scan">סריקת AI</a>
-      <a class="lnk" href="#calc">מחשבון מס</a>
+      <a class="lnk" href="#calc">הדשבורד</a>
       <a class="lnk" href="#how">איך זה עובד</a>
       <a class="lnk" href="#pricing">תמחור</a>
       <a class="lnk" href="#faq">שאלות נפוצות</a>
@@ -404,30 +414,30 @@ footer.foot { border-top:1px solid var(--border-soft); padding:54px 0 36px; marg
 <section class="hero" id="top">
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <span class="pill"><span class="dot" aria-hidden="true"></span> בנוי לחוקי המס של 2026</span>
-      <h1>המיסים שלך,<br><span class="accent">פשוט מסתדרים.</span></h1>
-      <p class="lead">צלם חשבונית. <strong>ה‑AI מסווג אותה, מחשב מע״מ ומס הכנסה, ומכין דיווח.</strong> כל מה שעצמאי ופרילנסר בישראל צריך כדי לנהל מס — במקום אחד, בלי שכר טרחה.</p>
+      <span class="pill"><span class="dot" aria-hidden="true"></span> לעצמאי הישראלי · חוקי מס 2026</span>
+      <h1>תדע בכל רגע<br><span class="accent">כמה תשלם בחשבון הבא.</span></h1>
+      <p class="lead">מע״מ, מס הכנסה וביטוח לאומי — <strong>מתעדכנים חי כל הזמן, כך שלעולם לא תופתע בחשבון הדו‑חודשי.</strong> תראה בדיוק כמה אתה חייב — ואפילו תכנן אם כדאי לדחוף עוד הוצאות.</p>
       <div class="hero-cta">
-        <a class="btn btn-primary btn-lg" href="#cta">התחל בחינם
+        <a class="btn btn-primary btn-lg" href="#calc">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+          כמה אני חייב עכשיו?</a>
+        <a class="btn btn-ghost btn-lg" href="#cta">התחל בחינם
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></a>
-        <a class="btn btn-ghost btn-lg" href="#calc">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/></svg>
-          נסה את מחשבון המס</a>
       </div>
       <div class="trust-row">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> דו‑חודשי בזמן אמת</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> תכנון מע״מ חכם</span>
         <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ללא כרטיס אשראי</span>
-        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> הצפנה מלאה</span>
-        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> מותאם לישראל בלבד</span>
       </div>
     </div>
     <div class="mock" role="img" aria-label="תצוגה מקדימה של לוח הבקרה של Taxil עם סיכום מע״מ, חשבוניות ומקדמה">
-      <div class="mock-head"><span class="ttl">לוח בקרה · יוני 2026</span><span class="pill" style="font-size:11px;padding:4px 10px;"><span class="dot" aria-hidden="true"></span> חי</span></div>
+      <div class="mock-head"><span class="ttl">החשבון הדו‑חודשי הבא · מאי–יוני</span><span class="pill" style="font-size:11px;padding:4px 10px;"><span class="dot" aria-hidden="true"></span> חי</span></div>
       <div class="mock-stats">
-        <div class="stat"><div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> מע״מ צפוי</div><div class="val num">₪3,420</div><div class="delta up">12%‑ מהחודש שעבר</div></div>
-        <div class="stat"><div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> חשבוניות</div><div class="val num">42</div><div class="delta up">8+ החודש</div></div>
+        <div class="stat"><div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> מע״מ</div><div class="val num">₪2,898</div><div class="delta up">עסקאות מינוס תשומות</div></div>
+        <div class="stat"><div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> מס הכנסה</div><div class="val num">₪1,778</div><div class="delta neutral">אחרי זיכוי</div></div>
       </div>
-      <div class="stat" style="margin-bottom:4px;"><div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> מקדמת מס הבאה</div><div style="display:flex;align-items:baseline;justify-content:space-between;"><div class="val num">₪1,250</div><div class="delta neutral">לתשלום ב‑15/07</div></div></div>
-      <div class="mock-row"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span><div class="meta"><div class="t">חשבונית — דלק פז</div><div class="s">סווג אוטומטית · הכרה 100%</div></div><span class="tag">עובד עצמאי</span><span class="amt num">₪340</span></div>
+      <div class="stat" style="margin-bottom:4px;"><div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> סה״כ לתשלום עד כה</div><div style="display:flex;align-items:baseline;justify-content:space-between;"><div class="val num" style="font-size:30px;">₪6,655</div><div class="delta neutral">לתשלום ב‑15/07</div></div></div>
+      <div class="mock-row"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span><div class="meta"><div class="t">ביטוח לאומי ובריאות</div><div class="s">מדורג · 5.97% / 17.83%</div></div><span class="amt num">₪1,979</span></div>
     </div>
   </div>
 </section>
@@ -452,7 +462,7 @@ footer.foot { border-top:1px solid var(--border-soft); padding:54px 0 36px; marg
       <div class="feat reveal"><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v1a3 3 0 0 0-3 3 3 3 0 0 0 0 6 3 3 0 0 0 3 3v1a3 3 0 0 0 6 0v-1a3 3 0 0 0 3-3 3 3 0 0 0 0-6 3 3 0 0 0-3-3V5a3 3 0 0 0-3-3z"/></svg></div><h3>AI מסווג חשבוניות</h3><p>צלם או העלה — Claude Vision מזהה ספק, סכום, מע״מ וח״פ, ומסווג לקטגוריה הנכונה תוך שניות.</p></div>
       <div class="feat reveal"><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="18"/><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01"/></svg></div><h3>מנוע מס מדויק</h3><p>מדרגות מס הכנסה 2026, נקודות זיכוי, ביטוח לאומי ומע״מ — מחושבים נכון, אוטומטית, בכל רגע.</p></div>
       <div class="feat reveal"><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><h3>הכרה אוטומטית בהוצאות</h3><p>המערכת יודעת ש‑100% מוכר על ציוד ו‑50% על ארוחה עם לקוח — לפי סוג העסק שלך. בלי לנחש.</p></div>
-      <div class="feat reveal"><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div><h3>דיווח 6111 מוכן</h3><p>בלחיצה אחת — דוח שנתי וטופס 6111 מוכנים לעלות לרשות המסים. בלי גיליונות אקסל ידניים.</p></div>
+      <div class="feat reveal"><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div><h3>תחזית החשבון הבא</h3><p>בכל רגע רואה כמה מע״מ, מס וביטוח לאומי יצאו בחשבון הדו‑חודשי הבא — בלי הפתעות בסוף.</p></div>
       <div class="feat reveal"><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><h3>תזכורות מקדמות</h3><p>לפני כל מקדמה דו‑חודשית או דיווח מע״מ — תזכורת חכמה עם הסכום המדויק והדדליין הבא.</p></div>
       <div class="feat reveal"><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><h3>הנתונים שלך, מוצפנים</h3><p>הצפנה מקצה לקצה. רק אתה ניגש לנתונים. ייצוא מלא בכל רגע — אפס נעילה לספק.</p></div>
     </div>
@@ -512,9 +522,9 @@ footer.foot { border-top:1px solid var(--border-soft); padding:54px 0 36px; marg
 <section class="section" id="calc" style="background:linear-gradient(180deg,transparent,rgba(20,184,132,.04),transparent);">
   <div class="wrap">
     <div class="sec-head reveal">
-      <span class="eyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/></svg> מחשבון מס חינמי</span>
-      <h2>כמה מס תשלם החודש?</h2>
-      <p>הזן מחזור והוצאות, וקבל חישוב מיידי לפי חוקי המס של 2026 — מע״מ, מס הכנסה, נקודות זיכוי, ביטוח לאומי ומקדמה.</p>
+      <span class="eyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/></svg> הדשבורד שלך</span>
+      <h2>כמה יצא לך בחשבון הבא?</h2>
+      <p>הזן מחזור והוצאות לתקופה, ותראה בדיוק כמה מע״מ, מס וביטוח לאומי יצאו בחשבון הדו‑חודשי הבא — לפי חוקי 2026. <strong style="color:var(--fg);">ותכנן: כמה לדחוף הוצאות כדי להקטין את המע״מ.</strong></p>
     </div>
     <div class="calc-shell reveal">
       <!-- inputs -->
@@ -529,8 +539,8 @@ footer.foot { border-top:1px solid var(--border-soft); padding:54px 0 36px; marg
 
         <label style="display:block;font-size:13.5px;color:var(--fg-muted);margin-bottom:7px;font-weight:500;">תקופת דיווח</label>
         <div class="seg" role="tablist" aria-label="תקופת דיווח">
-          <button type="button" id="pt-monthly" class="on" role="tab" aria-selected="true" onclick="setPeriod('monthly')">חודשי</button>
-          <button type="button" id="pt-bimonthly" class="" role="tab" aria-selected="false" onclick="setPeriod('bimonthly')">דו‑חודשי</button>
+          <button type="button" id="pt-monthly" class="" role="tab" aria-selected="false" onclick="setPeriod('monthly')">חודשי</button>
+          <button type="button" id="pt-bimonthly" class="on" role="tab" aria-selected="true" onclick="setPeriod('bimonthly')">דו‑חודשי</button>
         </div>
 
         <div class="fld">
@@ -554,9 +564,20 @@ footer.foot { border-top:1px solid var(--border-soft); padding:54px 0 36px; marg
           </div>
         </div>
 
+        <div id="planner" class="planner">
+          <div class="planner-head">
+            <span class="planner-t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/></svg> תכנון מע״מ — מה אם אוסיף הוצאות?</span>
+          </div>
+          <input type="range" id="whatif" min="0" max="20000" step="250" value="0" oninput="recalc()" aria-label="הוצאות נוספות לתכנון">
+          <div class="planner-row"><span>הוצאות נוספות: <b id="whatifVal" class="num">₪0</b></span><span id="whatifSave" class="planner-save"></span></div>
+        </div>
         <div class="calc-note">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           מבוסס על חוקי המס הרשמיים של 2026: מדרגות מס מעודכנות, נקודת זיכוי ₪2,976, וביטוח לאומי מדורג (5.97% / 17.83%). ברירת מחדל לנקודות זיכוי: 2.25 (גבר) / 2.75 (אישה). חישוב מקורב לתכנון בלבד.
+        </div>
+        <div class="sync-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          כרגע מזינים מחזור ידנית. <b style="color:var(--fg-muted);">בקרוב: סנכרון אוטומטי עם תוכנת החשבוניות שלך.</b>
         </div>
       </div>
 
@@ -564,7 +585,7 @@ footer.foot { border-top:1px solid var(--border-soft); padding:54px 0 36px; marg
       <div class="calc-panel result">
         <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> התוצאה שלך</h3>
         <div class="res-big">
-          <div class="lbl">סה״כ לתשלום משוער <span id="periodLbl">(החודש)</span></div>
+          <div class="lbl">סה״כ לתשלום בחשבון הבא <span id="periodLbl">(החודשיים)</span></div>
           <div class="amt accent num" id="rTotal">₪0</div>
           <div class="sub">מע״מ + מס הכנסה + ביטוח לאומי</div>
         </div>
@@ -573,7 +594,7 @@ footer.foot { border-top:1px solid var(--border-soft); padding:54px 0 36px; marg
         <div class="res-line"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ביטוח לאומי ובריאות</span><span class="v num" id="rBituach">₪0</span></div>
         <div class="res-line"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg> מקדמת מס הכנסה</span><span class="v num" id="rAdvance">₪0</span></div>
         <div class="res-line"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> הכנסה חייבת (נטו)</span><span class="v num pos" id="rTaxable">₪0</span></div>
-        <a class="btn btn-primary calc-cta" href="#cta" style="width:100%;justify-content:center;">פתח חשבון ותעקוב אוטומטית
+        <a class="btn btn-primary calc-cta" href="#cta" style="width:100%;justify-content:center;">עקוב אחרי זה אוטומטית — התחל בחינם
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></a>
       </div>
     </div>
@@ -724,7 +745,7 @@ footer.foot { border-top:1px solid var(--border-soft); padding:54px 0 36px; marg
       <div class="foot-col">
         <h4>מוצר</h4>
         <a href="#features">יכולות</a>
-        <a href="#calc">מחשבון מס</a>
+        <a href="#calc">הדשבורד ותכנון מע״מ</a>
         <a href="#pricing">תמחור</a>
         <a href="#how">איך זה עובד</a>
       </div>
@@ -859,6 +880,25 @@ function setPeriod(p){
   recalc();
 }
 
+// Pure compute: returns the full breakdown for given inputs.
+function compute(isMorshe, revenue, expensesGross, creditPoints, advRate, periodMonths){
+  var vatInputDeductible=0, expenseNetForIncomeTax=0;
+  if(isMorshe){ var net=expensesGross/(1+VAT_RATE); vatInputDeductible=expensesGross-net; expenseNetForIncomeTax=net; }
+  else { expenseNetForIncomeTax=expensesGross; }
+  var revenueNet = isMorshe ? revenue/(1+VAT_RATE) : revenue;
+  var vatOutput = isMorshe ? revenue-revenueNet : 0;
+  var vatToPay = isMorshe ? (vatOutput-vatInputDeductible) : 0;
+  var taxableIncome = Math.max(0, revenueNet-expenseNetForIncomeTax);
+  var annualizedTaxable = taxableIncome*(12/periodMonths);
+  var grossIncomeTax = progressiveTax(annualizedTaxable)*(periodMonths/12);
+  var creditDeduction = creditPoints*CREDIT_POINT_VALUE*(periodMonths/12);
+  var netIncomeTax = Math.max(0, grossIncomeTax-creditDeduction);
+  var expectedAdvance = revenueNet*(advRate/100);
+  var bituachLeumi = calcBituachLeumi(annualizedTaxable)*(periodMonths/12);
+  var total = Math.max(0,vatToPay)+netIncomeTax+bituachLeumi;
+  return { vatToPay:vatToPay, netIncomeTax:netIncomeTax, bituachLeumi:bituachLeumi, expectedAdvance:expectedAdvance, taxableIncome:taxableIncome, total:total };
+}
+
 function recalc(){
   var isMorshe = state.businessType==='osek_morshe';
   var revenue = Math.max(0, parseFloat(document.getElementById('rev').value)||0);
@@ -866,52 +906,33 @@ function recalc(){
   var creditPoints = Math.max(0, parseFloat(document.getElementById('cp').value)||0);
   var advRate = Math.max(0, parseFloat(document.getElementById('adv').value)||0);
   var periodMonths = state.period==='monthly' ? 1 : 2;
+  var extra = Math.max(0, parseFloat(document.getElementById('whatif').value)||0);
 
-  // VAT input (morshe only): assume all expenses carry 18% VAT, 100% deductible
-  var vatInputDeductible = 0, expenseNetForIncomeTax = 0;
-  if(isMorshe){
-    var net = expensesGross/(1+VAT_RATE);
-    vatInputDeductible = expensesGross - net;
-    expenseNetForIncomeTax = net;
-  } else {
-    expenseNetForIncomeTax = expensesGross;
-  }
+  var base = compute(isMorshe, revenue, expensesGross, creditPoints, advRate, periodMonths);
+  var plan = compute(isMorshe, revenue, expensesGross+extra, creditPoints, advRate, periodMonths);
+  var r = plan; // results reflect the planned (with extra) scenario
 
-  // Revenue
-  var revenueNet = isMorshe ? revenue/(1+VAT_RATE) : revenue;
-  var vatOutput = isMorshe ? revenue - revenueNet : 0;
-  var vatToPay = isMorshe ? (vatOutput - vatInputDeductible) : 0;
+  document.getElementById('rTotal').textContent = ils(r.total);
+  document.getElementById('rTax').textContent = ils(r.netIncomeTax);
+  document.getElementById('rBituach').textContent = ils(r.bituachLeumi);
+  document.getElementById('rAdvance').textContent = ils(r.expectedAdvance);
+  document.getElementById('rTaxable').textContent = ils(r.taxableIncome);
 
-  // Income tax (annualize → brackets → back to period)
-  var taxableIncome = Math.max(0, revenueNet - expenseNetForIncomeTax);
-  var annualizedTaxable = taxableIncome * (12/periodMonths);
-  var annualGrossTax = progressiveTax(annualizedTaxable);
-  var grossIncomeTax = annualGrossTax * (periodMonths/12);
-  var creditDeduction = creditPoints * CREDIT_POINT_VALUE * (periodMonths/12);
-  var netIncomeTax = Math.max(0, grossIncomeTax - creditDeduction);
-  var expectedAdvance = revenueNet * (advRate/100);
-  // Tiered Bituach Leumi: compute annual then scale back to the period
-  var annualBituach = calcBituachLeumi(annualizedTaxable);
-  var bituachLeumi = annualBituach * (periodMonths/12);
-
-  var total = Math.max(0, vatToPay) + netIncomeTax + bituachLeumi;
-
-  // render
-  document.getElementById('rTotal').textContent = ils(total);
-  document.getElementById('rTax').textContent = ils(netIncomeTax);
-  document.getElementById('rBituach').textContent = ils(bituachLeumi);
-  document.getElementById('rAdvance').textContent = ils(expectedAdvance);
-  document.getElementById('rTaxable').textContent = ils(taxableIncome);
-
-  var vatLine = document.getElementById('vatLine');
-  var rVat = document.getElementById('rVat');
+  var vatLine = document.getElementById('vatLine'), rVat = document.getElementById('rVat');
   if(isMorshe){
     vatLine.style.display='flex';
-    if(vatToPay < 0){ rVat.textContent = ils(Math.abs(vatToPay)) + " (החזר)"; rVat.className='v num pos'; }
-    else { rVat.textContent = ils(vatToPay); rVat.className='v num'; }
-  } else {
-    vatLine.style.display='none';
-  }
+    if(r.vatToPay < 0){ rVat.textContent = ils(Math.abs(r.vatToPay)) + " (החזר)"; rVat.className='v num pos'; }
+    else { rVat.textContent = ils(r.vatToPay); rVat.className='v num'; }
+  } else { vatLine.style.display='none'; }
+
+  // What-if planner output
+  document.getElementById('whatifVal').textContent = ils(extra);
+  var saveEl = document.getElementById('whatifSave');
+  if(extra>0){
+    var saved = base.total - plan.total;
+    saveEl.textContent = (saved>0 ? 'תשלם פחות ב‑' + ils(saved) : 'אין חיסכון');
+    saveEl.style.color = saved>0 ? 'var(--accent)' : 'var(--fg-dim)';
+  } else { saveEl.textContent=''; }
 }
 
 /* scroll reveal */
