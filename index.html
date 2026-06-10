@@ -211,6 +211,24 @@ header.nav { position:sticky; top:0; z-index:50; backdrop-filter:blur(16px) satu
 .step h3 { font-size:19px; font-weight:700; margin:18px 0 9px; }
 .step p { font-size:15px; color:var(--fg-muted); line-height:1.62; }
 
+/* ============ OCR SCAN ============ */
+.scan-shell { display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:stretch; }
+.dropzone { border:2px dashed var(--border); border-radius:16px; padding:38px 20px; text-align:center; cursor:pointer; transition:border-color .2s,background .2s; background:var(--bg); }
+.dropzone:hover, .dropzone.drag { border-color:var(--accent); background:rgba(47,230,168,.05); }
+.dropzone:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.dz-ic { width:46px; height:46px; color:var(--accent); margin-bottom:14px; }
+.dz-t { font-weight:700; font-size:17px; margin-bottom:6px; }
+.dz-s { font-size:13px; color:var(--fg-dim); }
+.inv-preview { width:100%; border-radius:14px; margin-top:16px; border:1px solid var(--border); max-height:280px; object-fit:contain; background:#fff; }
+.scan-idle { text-align:center; color:var(--fg-dim); padding:40px 10px; font-size:15px; }
+.scan-loading { text-align:center; color:var(--fg-muted); padding:40px 10px; font-size:15px; }
+.spinner { width:42px; height:42px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; margin:0 auto 16px; animation:spin 0.8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.scan-conf { margin-top:16px; font-size:13px; color:var(--fg-dim); text-align:center; }
+.scan-conf .bar { height:8px; background:var(--bg); border:1px solid var(--border-soft); border-radius:999px; overflow:hidden; margin-top:8px; }
+.scan-conf .fill { height:100%; background:linear-gradient(90deg,var(--accent-deep),var(--accent)); border-radius:999px; transition:width .5s; }
+.scan-err { color:var(--danger); font-size:14px; padding:20px; text-align:center; line-height:1.6; }
+
 /* ============ CALCULATOR ============ */
 .calc-shell { display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:stretch; }
 .calc-panel { background:linear-gradient(165deg,var(--surface) 0%,var(--bg-2) 100%); border:1px solid var(--border); border-radius:22px; padding:30px; }
@@ -366,6 +384,7 @@ footer.foot { border-top:1px solid var(--border-soft); padding:54px 0 36px; marg
     </a>
     <nav class="nav-links" id="navLinks" aria-label="ניווט ראשי">
       <a class="lnk" href="#features">יכולות</a>
+      <a class="lnk" href="#scan">סריקת AI</a>
       <a class="lnk" href="#calc">מחשבון מס</a>
       <a class="lnk" href="#how">איך זה עובד</a>
       <a class="lnk" href="#pricing">תמחור</a>
@@ -436,6 +455,55 @@ footer.foot { border-top:1px solid var(--border-soft); padding:54px 0 36px; marg
       <div class="feat reveal"><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div><h3>דיווח 6111 מוכן</h3><p>בלחיצה אחת — דוח שנתי וטופס 6111 מוכנים לעלות לרשות המסים. בלי גיליונות אקסל ידניים.</p></div>
       <div class="feat reveal"><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><h3>תזכורות מקדמות</h3><p>לפני כל מקדמה דו‑חודשית או דיווח מע״מ — תזכורת חכמה עם הסכום המדויק והדדליין הבא.</p></div>
       <div class="feat reveal"><div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><h3>הנתונים שלך, מוצפנים</h3><p>הצפנה מקצה לקצה. רק אתה ניגש לנתונים. ייצוא מלא בכל רגע — אפס נעילה לספק.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LIVE OCR — real invoice scan ============ -->
+<section class="section" id="scan" style="background:linear-gradient(180deg,transparent,rgba(20,184,132,.04),transparent);">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> סריקת חשבונית חיה</span>
+      <h2>העלה חשבונית — ה‑AI יקרא אותה לבד.</h2>
+      <p>גרור תמונה של חשבונית או צלם אחת, וClaude Vision יחלץ ספק, תאריך, סכום, מע״מ וח״פ — אוטומטית, באמת.</p>
+    </div>
+    <div class="scan-shell reveal">
+      <div class="calc-panel">
+        <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="העלה תמונת חשבונית">
+          <input type="file" id="invFile" accept="image/*" capture="environment" hidden>
+          <svg class="dz-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div class="dz-t">גרור חשבונית לכאן</div>
+          <div class="dz-s">או לחץ לבחירה / צילום · JPG, PNG (עד 9MB)</div>
+        </div>
+        <img id="invPreview" class="inv-preview" alt="תצוגה מקדימה של החשבונית" hidden>
+        <button id="scanBtn" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:16px;" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          סרוק את החשבונית
+        </button>
+      </div>
+      <div class="calc-panel result">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> מה ה‑AI חילץ</h3>
+        <div id="scanIdle" class="scan-idle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="width:46px;height:46px;color:var(--fg-dim);margin-bottom:14px;"><path d="M12 2a3 3 0 0 0-3 3v1a3 3 0 0 0-3 3 3 3 0 0 0 0 6 3 3 0 0 0 3 3v1a3 3 0 0 0 6 0v-1a3 3 0 0 0 3-3 3 3 0 0 0 0-6 3 3 0 0 0-3-3V5a3 3 0 0 0-3-3z"/></svg>
+          <p>העלה חשבונית ולחץ "סרוק" כדי לראות את ה‑AI בפעולה.</p>
+        </div>
+        <div id="scanLoading" class="scan-loading" hidden>
+          <div class="spinner" aria-hidden="true"></div>
+          <p>Claude Vision קורא את החשבונית…</p>
+        </div>
+        <div id="scanResult" hidden>
+          <div class="res-line"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> ספק</span><span class="v" id="oVendor">—</span></div>
+          <div class="res-line"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg> תאריך</span><span class="v num" id="oDate">—</span></div>
+          <div class="res-line"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> סכום כולל</span><span class="v num" id="oTotal">—</span></div>
+          <div class="res-line"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/></svg> מע״מ</span><span class="v num" id="oVat">—</span></div>
+          <div class="res-line"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> ח״פ / עוסק</span><span class="v" id="oBiz">—</span></div>
+          <div class="res-line"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> קטגוריה</span><span class="v" id="oCat">—</span></div>
+          <div class="scan-conf" id="oConf"></div>
+          <a class="btn btn-primary calc-cta" href="#cta" style="width:100%;justify-content:center;">שמור והמשך לחשבון מלא
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></a>
+        </div>
+        <div id="scanError" class="scan-err" hidden></div>
+      </div>
     </div>
   </div>
 </section>
@@ -675,6 +743,57 @@ footer.foot { border-top:1px solid var(--border-soft); padding:54px 0 36px; marg
 </footer>
 
 <script>
+/* ============================================================
+   Live OCR — real invoice scan via Claude Vision backend.
+   Change OCR_ENDPOINT to your deployed backend URL.
+   ============================================================ */
+var OCR_ENDPOINT = "https://laugh-placed-confirmed-ranks.trycloudflare.com/api/ocr";
+(function(){
+  var dz=document.getElementById('dropzone'), inp=document.getElementById('invFile'),
+      prev=document.getElementById('invPreview'), btn=document.getElementById('scanBtn'),
+      idle=document.getElementById('scanIdle'), load=document.getElementById('scanLoading'),
+      out=document.getElementById('scanResult'), err=document.getElementById('scanError');
+  if(!dz) return;
+  var dataUrl=null;
+  function ils(n){ if(n===null||n===undefined||isNaN(n)) return '—'; return '₪'+Math.round(n).toLocaleString('en-US'); }
+  function pick(){ inp.click(); }
+  dz.addEventListener('click', pick);
+  dz.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); pick(); } });
+  ['dragenter','dragover'].forEach(function(ev){ dz.addEventListener(ev,function(e){ e.preventDefault(); dz.classList.add('drag'); }); });
+  ['dragleave','drop'].forEach(function(ev){ dz.addEventListener(ev,function(e){ e.preventDefault(); dz.classList.remove('drag'); }); });
+  dz.addEventListener('drop', function(e){ var f=e.dataTransfer.files[0]; if(f) handleFile(f); });
+  inp.addEventListener('change', function(){ if(inp.files[0]) handleFile(inp.files[0]); });
+  function handleFile(f){
+    if(!/^image\//.test(f.type)){ showErr('קובץ לא נתמך — העלה תמונה (JPG/PNG).'); return; }
+    if(f.size>9*1024*1024){ showErr('הקובץ גדול מדי (עד 9MB).'); return; }
+    var r=new FileReader();
+    r.onload=function(){ dataUrl=r.result; prev.src=dataUrl; prev.hidden=false; btn.disabled=false; err.hidden=true; };
+    r.readAsDataURL(f);
+  }
+  function showErr(m){ err.textContent=m; err.hidden=false; idle.hidden=true; load.hidden=true; out.hidden=true; }
+  btn.addEventListener('click', function(){
+    if(!dataUrl) return;
+    idle.hidden=true; out.hidden=true; err.hidden=true; load.hidden=false; btn.disabled=true;
+    fetch(OCR_ENDPOINT,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({image:dataUrl}) })
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        load.hidden=true; btn.disabled=false;
+        if(!j.ok || !j.data){ showErr('הסריקה נכשלה: '+(j.error||'שגיאה לא ידועה')); return; }
+        var d=j.data;
+        document.getElementById('oVendor').textContent=d.vendor||'—';
+        document.getElementById('oDate').textContent=d.date||'—';
+        document.getElementById('oTotal').textContent=ils(d.total);
+        document.getElementById('oVat').textContent=ils(d.vat);
+        document.getElementById('oBiz').textContent=d.business_id||'—';
+        document.getElementById('oCat').textContent=d.category||'—';
+        var c=document.getElementById('oConf'); var pct=Math.round((d.confidence||0)*100);
+        c.innerHTML='רמת ביטחון הזיהוי: '+pct+'%<div class="bar"><div class="fill" style="width:'+pct+'%"></div></div>';
+        out.hidden=false;
+      })
+      .catch(function(e){ load.hidden=true; btn.disabled=false; showErr('לא הצלחנו להתחבר לשרת הסריקה. נסה שוב.'); });
+  });
+})();
+
 /* ============================================================
    Tax engine — ported 1:1 from Taxil's demo-calculator.ts
    ============================================================ */
