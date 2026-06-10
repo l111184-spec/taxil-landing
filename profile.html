@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Taxil — הפרופיל המס שלי</title>
+<meta name="description" content="מלא את הפרטים האישיים שלך — מצב משפחתי, ילדים, סטטוס מיוחד ומקצוע — ו-Taxil יחשב אוטומטית את נקודות הזיכוי שלך לפי חוקי 2026." />
+<meta name="theme-color" content="#FBFCFE" />
+<meta name="robots" content="noindex" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon-512.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{ --radius:18px; --radius-sm:12px; --maxw:560px; --pad:clamp(16px,4vw,28px);
+  --font-he:"Heebo",system-ui,-apple-system,"Segoe UI",sans-serif; --font-num:"Inter","Heebo",sans-serif; }
+[data-theme="dark"]{ --bg:#0B1120;--bg-2:#0E162A;--surface:#131C30;--surface-2:#18233C;--border:#243049;--border-soft:#1B2540;
+  --accent:#2FE6A8;--accent-2:#14B884;--accent-deep:#0E7A57;--accent-glow:rgba(47,230,168,.14);
+  --fg:#F4F8FF;--fg-muted:#9FB0C9;--fg-dim:#61728E;--danger:#F87171;--on-accent:#04231A; }
+[data-theme="light"]{ --bg:#FBFCFE;--bg-2:#F2F6FB;--surface:#FFFFFF;--surface-2:#F5F8FC;--border:#E3EAF3;--border-soft:#EDF2F8;
+  --accent:#0EA579;--accent-2:#13B884;--accent-deep:#0B8A66;--accent-glow:rgba(14,165,121,.18);
+  --fg:#0E1B2E;--fg-muted:#52617A;--fg-dim:#76849B;--danger:#DC2626;--on-accent:#FFFFFF; }
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-he);background:var(--bg);color:var(--fg);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100dvh;
+  padding-bottom:env(safe-area-inset-bottom);}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
+a{color:inherit;text-decoration:none;}
+.field-bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(700px 500px at 80% -10%,var(--accent-glow),transparent 60%),linear-gradient(180deg,var(--bg),var(--bg-2));}
+
+/* top bar */
+.topbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--border-soft);}
+.topbar-in{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:14px var(--pad);}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;}
+.brand .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;}
+.brand .logo svg{width:19px;height:19px;color:var(--on-accent);}
+.back{color:var(--fg-muted);font-size:14px;display:flex;align-items:center;gap:6px;}
+.back svg{width:18px;height:18px;}
+
+.shell{max-width:var(--maxw);margin:0 auto;padding:var(--pad);}
+
+/* progress */
+.prog{display:flex;gap:6px;margin-bottom:8px;}
+.prog .seg{flex:1;height:5px;border-radius:999px;background:var(--border);transition:background .3s;}
+.prog .seg.on{background:linear-gradient(90deg,var(--accent-deep),var(--accent));}
+.step-label{font-size:13px;color:var(--fg-dim);margin-bottom:22px;display:flex;justify-content:space-between;}
+.step-label b{color:var(--fg-muted);font-weight:600;}
+
+/* step card */
+.step{display:none;animation:fade .35s ease;}
+.step.active{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.step h2{font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;}
+.step .sub{color:var(--fg-muted);font-size:15px;margin-bottom:24px;}
+
+/* fields */
+.fld{margin-bottom:18px;}
+.fld label{display:block;font-size:14px;font-weight:600;color:var(--fg);margin-bottom:8px;}
+.fld input[type=text],.fld input[type=number],.fld input[type=date],.fld select{
+  width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--fg);
+  font-family:var(--font-he);font-size:16px;padding:14px;transition:border-color .15s;min-height:50px;}
+.fld input:focus,.fld select:focus{border-color:var(--accent);outline:none;}
+.fld .num-in{font-family:var(--font-num);}
+
+/* option grid (radio cards) */
+.opts{display:grid;gap:10px;}
+.opts.cols-2{grid-template-columns:1fr 1fr;}
+.opt{position:relative;cursor:pointer;}
+.opt input{position:absolute;opacity:0;pointer-events:none;}
+.opt .box{display:flex;align-items:center;gap:11px;padding:15px;border:1.5px solid var(--border);border-radius:13px;background:var(--surface);transition:all .15s;min-height:54px;}
+.opt .box .emoji{font-size:22px;}
+.opt .box .t{font-weight:600;font-size:15px;}
+.opt input:checked + .box{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 9%,var(--surface));box-shadow:0 0 0 3px var(--accent-glow);}
+.opt input:focus-visible + .box{outline:2px solid var(--accent);outline-offset:2px;}
+
+/* toggle switch row */
+.switch-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px;border:1px solid var(--border);border-radius:13px;background:var(--surface);margin-bottom:10px;}
+.switch-row .lbl{font-weight:600;font-size:15px;}
+.switch-row .lbl small{display:block;color:var(--fg-dim);font-weight:400;font-size:12.5px;margin-top:2px;}
+.switch{position:relative;width:50px;height:28px;flex-shrink:0;}
+.switch input{opacity:0;width:0;height:0;}
+.switch .track{position:absolute;inset:0;background:var(--border);border-radius:999px;transition:.2s;cursor:pointer;}
+.switch .track::before{content:"";position:absolute;width:22px;height:22px;border-radius:50%;background:#fff;top:3px;right:3px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.switch input:checked + .track{background:var(--accent);}
+.switch input:checked + .track::before{transform:translateX(-22px);}
+
+/* children repeater */
+.child{border:1px solid var(--border);border-radius:13px;padding:15px;margin-bottom:10px;background:var(--surface);}
+.child-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.child-head .t{font-weight:700;font-size:14px;}
+.child-head .rm{color:var(--danger);font-size:13px;cursor:pointer;background:none;border:none;font-family:var(--font-he);}
+.child-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.add-child{width:100%;padding:14px;border:1.5px dashed var(--border);border-radius:13px;background:none;color:var(--accent);font-family:var(--font-he);font-weight:600;font-size:15px;cursor:pointer;transition:.15s;}
+.add-child:hover{border-color:var(--accent);background:var(--accent-glow);}
+
+/* live points pill */
+.points-live{position:sticky;bottom:0;margin-top:8px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 12%,var(--surface)),var(--surface));border:1px solid var(--accent-deep);border-radius:14px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;}
+.points-live .l{font-size:13.5px;color:var(--fg-muted);}
+.points-live .v{font-family:var(--font-num);font-weight:800;font-size:26px;color:var(--accent);}
+
+/* nav buttons */
+.nav-btns{display:flex;gap:12px;margin-top:24px;}
+.btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-he);font-weight:600;font-size:16px;
+  padding:16px;border-radius:13px;cursor:pointer;border:1px solid transparent;transition:transform .15s,box-shadow .15s,background .15s;min-height:54px;}
+.btn svg{width:18px;height:18px;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:var(--on-accent);box-shadow:0 6px 18px -6px var(--accent-glow);}
+[data-theme="light"] .btn-primary{background:linear-gradient(135deg,#0B8A66,#0A7757);}
+.btn-primary:hover{transform:translateY(-2px);}
+.btn-ghost{background:var(--surface);color:var(--fg);border-color:var(--border);flex:0 0 auto;padding-inline:22px;}
+.btn-ghost:hover{background:var(--surface-2);}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+/* result screen */
+.result-hero{text-align:center;padding:20px 0 8px;}
+.result-hero .big{font-family:var(--font-num);font-weight:900;font-size:64px;line-height:1;background:linear-gradient(120deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+[data-theme="light"] .result-hero .big{background:linear-gradient(120deg,#0B8A66,#13B884);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.result-hero .cap{font-size:15px;color:var(--fg-muted);margin-top:6px;}
+.breakdown{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:8px 18px;margin:22px 0;}
+.brk-line{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-soft);font-size:14.5px;}
+.brk-line:last-child{border-bottom:0;}
+.brk-line .k{color:var(--fg-muted);}
+.brk-line .v{font-family:var(--font-num);font-weight:700;}
+.brk-line.total{font-weight:800;}
+.brk-line.total .v{color:var(--accent);font-size:18px;}
+.disc{font-size:12px;color:var(--fg-dim);text-align:center;margin-top:18px;line-height:1.55;}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="field-bg" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a href="index.html" class="brand"><span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span> Taxil</a>
+    <a href="index.html" class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg> חזרה</a>
+  </div>
+</header>
+
+<main class="shell">
+  <div class="prog" id="prog" aria-hidden="true"></div>
+  <div class="step-label"><span id="stepName">פרטים אישיים</span><b><span id="stepNum">1</span> / 5</b></div>
+
+  <!-- STEP 1 — Identity -->
+  <section class="step active" data-step="1">
+    <h2>קצת עליך</h2>
+    <p class="sub">נתחיל בבסיס — זה קובע את נקודת הזיכוי הראשונה שלך.</p>
+    <div class="fld"><label for="fName">שם מלא <span style="color:var(--fg-dim);font-weight:400;">(לא חובה)</span></label><input type="text" id="fName" placeholder="ישראל ישראלי"></div>
+    <div class="fld">
+      <label>מין</label>
+      <div class="opts cols-2">
+        <label class="opt"><input type="radio" name="gender" value="male" checked onchange="calc()"><span class="box"><span class="emoji">👨</span><span class="t">גבר</span></span></label>
+        <label class="opt"><input type="radio" name="gender" value="female" onchange="calc()"><span class="box"><span class="emoji">👩</span><span class="t">אישה <small style="color:var(--accent);">+0.5 נק׳</small></span></span></label>
+      </div>
+    </div>
+    <div class="fld"><label for="fBirth">שנת לידה</label><input type="number" id="fBirth" class="num-in" inputmode="numeric" min="1940" max="2010" placeholder="1990"></div>
+  </section>
+
+  <!-- STEP 2 — Family status -->
+  <section class="step" data-step="2">
+    <h2>מצב משפחתי</h2>
+    <p class="sub">המצב המשפחתי משפיע על נקודות הזיכוי שמגיעות לך.</p>
+    <div class="fld">
+      <div class="opts">
+        <label class="opt"><input type="radio" name="marital" value="single" checked onchange="onMarital()"><span class="box"><span class="emoji">🙋</span><span class="t">רווק/ה</span></span></label>
+        <label class="opt"><input type="radio" name="marital" value="married" onchange="onMarital()"><span class="box"><span class="emoji">💍</span><span class="t">נשוי/אה</span></span></label>
+        <label class="opt"><input type="radio" name="marital" value="divorced" onchange="onMarital()"><span class="box"><span class="emoji">📄</span><span class="t">גרוש/ה</span></span></label>
+        <label class="opt"><input type="radio" name="marital" value="widowed" onchange="onMarital()"><span class="box"><span class="emoji">🕯️</span><span class="t">אלמן/ה</span></span></label>
+      </div>
+    </div>
+    <div id="singleParentRow" style="display:none;">
+      <div class="switch-row">
+        <div class="lbl">משפחה חד‑הורית<small>הורה יחיד שמגדל ילדים בגפו · +1.0 נק׳</small></div>
+        <label class="switch"><input type="checkbox" id="singleParent" onchange="calc()"><span class="track"></span></label>
+      </div>
+    </div>
+    <div class="switch-row">
+      <div class="lbl">משלם/ת מזונות<small>תשלום מזונות לילדים · +1.0 נק׳</small></div>
+      <label class="switch"><input type="checkbox" id="alimony" onchange="calc()"><span class="track"></span></label>
+    </div>
+  </section>
+
+  <!-- STEP 3 — Children -->
+  <section class="step" data-step="3">
+    <h2>ילדים</h2>
+    <p class="sub">לכל ילד מגיעות נקודות זיכוי לפי הגיל. הוסף את הילדים שבמשמורתך.</p>
+    <div id="childrenList"></div>
+    <button type="button" class="add-child" onclick="addChild()">+ הוסף ילד/ה</button>
+  </section>
+
+  <!-- STEP 4 — Special status -->
+  <section class="step" data-step="4">
+    <h2>סטטוס מיוחד</h2>
+    <p class="sub">סטטוסים מסוימים מזכים בנקודות נוספות. סמן את מה שרלוונטי אליך.</p>
+    <div class="switch-row">
+      <div class="lbl">עולה חדש/ה<small>זכאות יחסית ל‑3.5 השנים הראשונות</small></div>
+      <label class="switch"><input type="checkbox" id="immigrant" onchange="onImmig()"><span class="track"></span></label>
+    </div>
+    <div class="fld" id="immigRow" style="display:none;"><label for="immigDate">תאריך עלייה</label><input type="date" id="immigDate" onchange="calc()"></div>
+    <div class="switch-row">
+      <div class="lbl">חייל/ת משוחרר/ת<small>זכאות ל‑36 חודשים מהשחרור</small></div>
+      <label class="switch"><input type="checkbox" id="soldier" onchange="onSoldier()"><span class="track"></span></label>
+    </div>
+    <div id="soldierRows" style="display:none;">
+      <div class="fld"><label for="dischargeDate">תאריך שחרור</label><input type="date" id="dischargeDate" onchange="calc()"></div>
+      <div class="fld"><label for="serviceMonths">חודשי שירות</label><input type="number" id="serviceMonths" class="num-in" inputmode="numeric" min="0" max="48" value="32" onchange="calc()"></div>
+    </div>
+  </section>
+
+  <!-- STEP 5 — Business -->
+  <section class="step" data-step="5">
+    <h2>העסק שלך</h2>
+    <p class="sub">סוג העסק והמקצוע קובעים איך מחושבים מע״מ והוצאות.</p>
+    <div class="fld">
+      <label>סוג עוסק</label>
+      <div class="opts cols-2">
+        <label class="opt"><input type="radio" name="biz" value="osek_patur" checked><span class="box"><span class="t">עוסק פטור</span></span></label>
+        <label class="opt"><input type="radio" name="biz" value="osek_morshe"><span class="box"><span class="t">עוסק מורשה</span></span></label>
+      </div>
+    </div>
+    <div class="fld"><label for="profession">מקצוע</label>
+      <select id="profession"><option value="">בחר מקצוע…</option></select>
+    </div>
+    <div class="fld"><label for="advRate">שיעור מקדמת מס הכנסה <span style="color:var(--fg-dim);font-weight:400;">%</span></label><input type="number" id="advRate" class="num-in" inputmode="numeric" min="0" max="100" step="0.5" value="10"></div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="step" data-step="6">
+    <div class="result-hero">
+      <div class="big num" id="rPoints">2.25</div>
+      <div class="cap">נקודות זיכוי שנתיות · שווי <span class="num" id="rValue">₪6,696</span> בשנה</div>
+    </div>
+    <div class="breakdown" id="rBreakdown"></div>
+    <a class="btn btn-primary" href="index.html#calc" id="toDashboard" style="text-decoration:none;">המשך לדשבורד עם הנתונים שלי
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></a>
+    <p class="disc">החישוב מבוסס על כללי נקודות הזיכוי של 2026 והוא מקורב לתכנון בלבד. ערכים סופיים תלויים בעדכוני רשות המסים ובנסיבות אישיות — מומלץ לאמת מול רואה חשבון.</p>
+  </section>
+
+  <!-- live points (hidden on result) -->
+  <div class="points-live" id="liveBar">
+    <span class="l">נקודות הזיכוי שלך עד כה</span>
+    <span class="v num" id="livePoints">2.25</span>
+  </div>
+
+  <div class="nav-btns" id="navBtns">
+    <button class="btn btn-ghost" id="btnBack" onclick="go(-1)" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg> חזרה</button>
+    <button class="btn btn-primary" id="btnNext" onclick="go(1)">המשך
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+  </div>
+</main>
+
+<script>
+/* ============================================================
+   Credit-points engine — ported from Taxil credit-points-calculator.ts
+   Updated to 2026: birth-year child = 2.5 (was 1.5).
+   ============================================================ */
+var CREDIT_POINT_VALUE = 2976; // 2026 annual value per point
+
+function pointsForChildAge(age){
+  if(age<0) return 0;
+  if(age===0) return 2.5;        // 2026: birth year now 2.5
+  if(age>=1 && age<=5) return 2.5;
+  if(age>=6 && age<=17) return 1.0;
+  if(age===18) return 0.5;
+  return 0;
+}
+function monthsSince(fromISO, ref){
+  var f=new Date(fromISO);
+  return (ref.getFullYear()-f.getFullYear())*12 + (ref.getMonth()-f.getMonth());
+}
+function newImmigrantPoints(dateISO, year){
+  if(!dateISO) return 0;
+  var imm=new Date(dateISO), yEnd=new Date(year,11,31), total=0;
+  for(var m=0;m<12;m++){
+    var md=new Date(year,m,15);
+    if(md<imm||md>yEnd) continue;
+    var mo=monthsSince(dateISO,md), per=0;
+    if(mo<18) per=3/12; else if(mo<30) per=2/12; else if(mo<42) per=1/12;
+    total+=per;
+  }
+  return total;
+}
+function dischargedSoldierPoints(dateISO, serviceMonths, year){
+  if(!dateISO||!serviceMonths) return 0;
+  var annual = serviceMonths>=24 ? 2 : 1;
+  var d=new Date(dateISO), months=0;
+  for(var m=0;m<12;m++){
+    var md=new Date(year,m,15);
+    if(md<d) continue;
+    if(monthsSince(dateISO,md)<36) months+=1;
+  }
+  return (months/12)*annual;
+}
+function r2(n){ return Math.round(n*100)/100; }
+function ils(n){ return "₪"+Math.round(n).toLocaleString("en-US"); }
+
+var children = [];
+var year = new Date().getFullYear();
+
+function val(id){ var e=document.getElementById(id); return e?e.value:""; }
+function checked(id){ var e=document.getElementById(id); return e?e.checked:false; }
+function radio(name){ var e=document.querySelector('input[name="'+name+'"]:checked'); return e?e.value:""; }
+
+function computeBreakdown(){
+  var gender = radio('gender');
+  var resident = 2.25;
+  var female = gender==='female' ? 0.5 : 0;
+  var singleParent = checked('singleParent') ? 1.0 : 0;
+  var alimony = checked('alimony') ? 1.0 : 0;
+
+  var childTotal=0;
+  children.forEach(function(c){
+    var age = parseInt(c.age,10);
+    if(isNaN(age)) return;
+    var pts = pointsForChildAge(age);
+    if(c.custody==='shared') pts/=2;
+    if(c.custody==='partner') pts=0;
+    childTotal+=pts;
+  });
+
+  var immigrant = checked('immigrant') ? newImmigrantPoints(val('immigDate'), year) : 0;
+  var soldier = checked('soldier') ? dischargedSoldierPoints(val('dischargeDate'), parseInt(val('serviceMonths'),10)||0, year) : 0;
+
+  var total = resident+female+singleParent+childTotal+alimony+immigrant+soldier;
+  return { resident:resident, female:r2(female), singleParent:r2(singleParent), children:r2(childTotal),
+           alimony:r2(alimony), immigrant:r2(immigrant), soldier:r2(soldier), total:r2(total) };
+}
+
+function calc(){
+  var b = computeBreakdown();
+  document.getElementById('livePoints').textContent = b.total.toFixed(2);
+  document.getElementById('rPoints').textContent = b.total.toFixed(2);
+  document.getElementById('rValue').textContent = ils(b.total*CREDIT_POINT_VALUE);
+  // breakdown render
+  var rows=[['תושב/ת ישראל',b.resident]];
+  if(b.female) rows.push(['אישה',b.female]);
+  if(b.singleParent) rows.push(['משפחה חד‑הורית',b.singleParent]);
+  if(b.children) rows.push(['ילדים ('+children.length+')',b.children]);
+  if(b.alimony) rows.push(['מזונות',b.alimony]);
+  if(b.immigrant) rows.push(['עולה חדש/ה',b.immigrant]);
+  if(b.soldier) rows.push(['חייל/ת משוחרר/ת',b.soldier]);
+  var html = rows.map(function(r){ return '<div class="brk-line"><span class="k">'+r[0]+'</span><span class="v num">+'+r[1].toFixed(2)+'</span></div>'; }).join('');
+  html += '<div class="brk-line total"><span class="k">סה״כ נקודות זיכוי</span><span class="v num">'+b.total.toFixed(2)+'</span></div>';
+  var bd=document.getElementById('rBreakdown'); if(bd) bd.innerHTML=html;
+}
+
+function onMarital(){
+  var m = radio('marital');
+  document.getElementById('singleParentRow').style.display = (m==='divorced'||m==='widowed'||m==='single') ? 'block' : 'none';
+  if(m==='married'){ document.getElementById('singleParent').checked=false; }
+  calc();
+}
+function onImmig(){ document.getElementById('immigRow').style.display = checked('immigrant')?'block':'none'; calc(); }
+function onSoldier(){ document.getElementById('soldierRows').style.display = checked('soldier')?'block':'none'; calc(); }
+
+/* children repeater */
+function renderChildren(){
+  var list=document.getElementById('childrenList');
+  list.innerHTML = children.map(function(c,i){
+    return '<div class="child"><div class="child-head"><span class="t">ילד/ה '+(i+1)+'</span>'+
+      '<button type="button" class="rm" onclick="rmChild('+i+')">הסר</button></div>'+
+      '<div class="child-row">'+
+      '<div class="fld" style="margin:0;"><label>גיל</label><input type="number" class="num-in" inputmode="numeric" min="0" max="25" value="'+(c.age||'')+'" oninput="setChild('+i+',\'age\',this.value)"></div>'+
+      '<div class="fld" style="margin:0;"><label>משמורת</label><select onchange="setChild('+i+',\'custody\',this.value)">'+
+        '<option value="full"'+(c.custody==='full'?' selected':'')+'>מלאה</option>'+
+        '<option value="shared"'+(c.custody==='shared'?' selected':'')+'>משותפת</option>'+
+        '<option value="partner"'+(c.custody==='partner'?' selected':'')+'>בן/בת הזוג</option>'+
+      '</select></div></div></div>';
+  }).join('');
+}
+function addChild(){ children.push({age:'',custody:'full'}); renderChildren(); calc(); }
+function rmChild(i){ children.splice(i,1); renderChildren(); calc(); }
+function setChild(i,k,v){ children[i][k]=v; calc(); }
+
+/* ---- profession list (from business-profiles.ts, 30 professions / 9 groups) ---- */
+var PROFESSIONS = [
+  ['טכנולוגיה', [['software_developer','💻 מפתח/ת תוכנה'],['devops_engineer','☁️ מהנדס/ת DevOps / Cloud'],['data_scientist','📊 Data Scientist / אנליסט'],['qa_engineer','🔍 מהנדס/ת QA'],['cyber_security','🔒 יועץ/ת סייבר']]],
+  ['עיצוב ויצירה', [['graphic_designer','🎨 מעצב/ת גרפי'],['ux_ui_designer','📱 מעצב/ת UX/UI'],['photographer','📸 צלם/ת'],['video_editor','🎬 עורך/ת וידאו'],['illustrator_animator','✏️ מאייר/ת / אנימטור/ית'],['writer_editor','✍️ כותב/ת / עורך/ת תוכן']]],
+  ['ייעוץ', [['business_consultant','💼 יועץ/ת עסקי'],['management_consultant','📈 יועץ/ת ניהול ארגוני'],['it_consultant','🖥️ יועץ/ת מערכות מידע']]],
+  ['בריאות וטיפול', [['psychologist','🧠 פסיכולוג/ית / עו״ס'],['alternative_therapist','🌿 מטפל/ת אלטרנטיבי'],['physiotherapist','💪 פיזיותרפיסט/ית'],['nutritionist','🥗 תזונאי/ת'],['dentist','🦷 רופא/ת שיניים']]],
+  ['חינוך והדרכה', [['private_teacher','📚 מורה פרטי/ת'],['course_instructor','🎓 מרצה / מדריך/ת'],['coach','🎯 מאמן/ת אישי / עסקי']]],
+  ['משפט ופיננסים', [['lawyer','⚖️ עו״ד'],['accountant','📒 רואה חשבון / יועץ מס'],['bookkeeper','📋 מנהל/ת חשבונות'],['financial_advisor','💰 יועץ/ת פיננסי']]],
+  ['שיווק ופרסום', [['digital_marketer','📱 שיווק דיגיטלי'],['social_media_manager','📲 רשתות חברתיות'],['seo_specialist','🔍 מומחה/ית SEO']]],
+  ['כושר ובריאות', [['personal_trainer','💪 מאמן/ת כושר אישי'],['yoga_instructor','🧘 מורה ליוגה / פילאטיס']]],
+];
+(function fillProf(){
+  var sel=document.getElementById('profession');
+  PROFESSIONS.forEach(function(grp){
+    var og=document.createElement('optgroup'); og.label=grp[0];
+    grp[1].forEach(function(p){ var o=document.createElement('option'); o.value=p[0]; o.textContent=p[1]; og.appendChild(o); });
+    sel.appendChild(og);
+  });
+})();
+
+/* ---- step navigation ---- */
+var current=1, TOTAL=5;
+function buildProg(){
+  var p=document.getElementById('prog');
+  for(var i=0;i<TOTAL;i++){ var s=document.createElement('div'); s.className='seg'+(i<current?' on':''); p.appendChild(s); }
+}
+var STEP_NAMES=['פרטים אישיים','מצב משפחתי','ילדים','סטטוס מיוחד','העסק שלך','סיכום'];
+function show(n){
+  document.querySelectorAll('.step').forEach(function(s){ s.classList.toggle('active', +s.dataset.step===n); });
+  document.querySelectorAll('#prog .seg').forEach(function(s,i){ s.classList.toggle('on', i<n); });
+  document.getElementById('stepNum').textContent = Math.min(n,TOTAL);
+  document.getElementById('stepName').textContent = STEP_NAMES[n-1];
+  document.getElementById('btnBack').style.display = n>1 ? 'inline-flex' : 'none';
+  var isResult = n>TOTAL;
+  document.getElementById('liveBar').style.display = isResult ? 'none' : 'flex';
+  document.getElementById('navBtns').style.display = isResult ? 'none' : 'flex';
+  var nb=document.getElementById('btnNext');
+  nb.innerHTML = (n===TOTAL) ? 'חשב נקודות זיכוי <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : 'המשך <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function go(d){
+  var n=current+d;
+  if(n<1) return;
+  if(n>TOTAL+1) { window.location.href='index.html#calc'; return; }
+  current=n;
+  if(n>TOTAL){ calc(); persist(); }
+  show(n);
+}
+function persist(){
+  try{
+    var data={ points:computeBreakdown().total, gender:radio('gender'), biz:radio('biz'), profession:val('profession'), advRate:val('advRate') };
+    localStorage.setItem('taxil-profile', JSON.stringify(data));
+  }catch(e){}
+}
+
+/* theme inherit from main site */
+(function(){ try{ var t=localStorage.getItem('taxil-theme'); if(t) document.documentElement.setAttribute('data-theme',t);}catch(e){} })();
+
+buildProg();
+addChild();
+calc();
+</script>
+</body>
+</html>
