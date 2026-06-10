@@ -556,7 +556,7 @@ footer.foot { border-top:1px solid var(--border-soft); padding:54px 0 36px; marg
 
         <div class="calc-note">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          ברירת המחדל לנקודות זיכוי: 2.25 (גבר) / 2.75 (אישה). החישוב מקורב למטרות תכנון בלבד.
+          מבוסס על חוקי המס הרשמיים של 2026: מדרגות מס מעודכנות, נקודת זיכוי ₪2,976, וביטוח לאומי מדורג (5.97% / 17.83%). ברירת מחדל לנקודות זיכוי: 2.25 (גבר) / 2.75 (אישה). חישוב מקורב לתכנון בלבד.
         </div>
       </div>
 
@@ -797,8 +797,29 @@ var OCR_ENDPOINT = "https://laugh-placed-confirmed-ranks.trycloudflare.com/api/o
 /* ============================================================
    Tax engine — ported 1:1 from Taxil's demo-calculator.ts
    ============================================================ */
-var VAT_RATE = 0.18, BITUACH_LEUMI_RATE = 0.12, CREDIT_POINT_VALUE = 2976;
-var BRACKETS = [[0,84120,0.10],[84120,120720,0.14],[120720,193800,0.20],[193800,269280,0.31],[269280,560280,0.35],[560280,721560,0.47],[721560,null,0.50]];
+/* === Official Israel 2026 tax constants ===
+   Income-tax brackets: gov.il / kol-zchut (updated for 2026 — 20% & 31% bands widened).
+   National Insurance (Bituach Leumi) for self-employed is TIERED, not flat:
+     low tier  (up to 60% of avg wage)   = 5.97%  (NI 2.87% + health 3.10%)
+     high tier (above, up to ceiling)    = 17.83% (NI 12.83% + health 5.00%)
+   Avg wage ~ ₪12,536/mo → 60% step ≈ ₪7,522/mo ≈ ₪90,264/yr ; ceiling ≈ ₪50,695/mo. */
+var VAT_RATE = 0.18, CREDIT_POINT_VALUE = 2976;
+var BRACKETS = [[0,84120,0.10],[84120,120720,0.14],[120720,228000,0.20],[228000,301200,0.31],[301200,560280,0.35],[560280,721560,0.47],[721560,null,0.50]];
+// Bituach Leumi tiers (annual amounts)
+var BL_LOW_CEIL = 90264;        // ~60% of avg wage, annual
+var BL_TOP_CEIL = 608400;       // contributions ceiling, annual (~₪50,695/mo)
+var BL_RATE_LOW = 0.0597;
+var BL_RATE_HIGH = 0.1783;
+function calcBituachLeumi(annualTaxable){
+  if(annualTaxable<=0) return 0;
+  var low = Math.min(annualTaxable, BL_LOW_CEIL) * BL_RATE_LOW;
+  var high = 0;
+  if(annualTaxable > BL_LOW_CEIL){
+    var highBase = Math.min(annualTaxable, BL_TOP_CEIL) - BL_LOW_CEIL;
+    high = highBase * BL_RATE_HIGH;
+  }
+  return low + high;
+}
 
 var state = { businessType:"osek_morshe", period:"monthly" };
 
@@ -869,7 +890,9 @@ function recalc(){
   var creditDeduction = creditPoints * CREDIT_POINT_VALUE * (periodMonths/12);
   var netIncomeTax = Math.max(0, grossIncomeTax - creditDeduction);
   var expectedAdvance = revenueNet * (advRate/100);
-  var bituachLeumi = taxableIncome * BITUACH_LEUMI_RATE;
+  // Tiered Bituach Leumi: compute annual then scale back to the period
+  var annualBituach = calcBituachLeumi(annualizedTaxable);
+  var bituachLeumi = annualBituach * (periodMonths/12);
 
   var total = Math.max(0, vatToPay) + netIncomeTax + bituachLeumi;
 
