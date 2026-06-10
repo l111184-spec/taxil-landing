@@ -139,6 +139,11 @@ a{color:inherit;text-decoration:none;}
 </header>
 
 <main class="shell">
+  <div id="activeBanner" style="display:none;align-items:center;gap:11px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 12%,var(--surface)),var(--surface));border:1px solid var(--accent-deep);border-radius:13px;padding:13px 16px;margin-bottom:18px;">
+    <span style="width:34px;height:34px;border-radius:50%;background:var(--accent);display:grid;place-items:center;flex-shrink:0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--on-accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;"><polyline points="20 6 9 17 4 12"/></svg></span>
+    <div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:14.5px;" id="abName">הפרופיל שלך פעיל</div><div style="font-size:12.5px;color:var(--fg-dim);" id="abSub">ממשיך מאיפה שהפסקת — הנתונים שמורים</div></div>
+    <a href="app.html" style="font-size:13px;font-weight:700;color:var(--accent);white-space:nowrap;">לדשבורד ←</a>
+  </div>
   <div class="prog" id="prog" aria-hidden="true"></div>
   <div class="step-label"><span id="stepName">פרטים אישיים</span><b><span id="stepNum">1</span> / 5</b></div>
 
@@ -466,6 +471,16 @@ function persist(){
 (function restore(){
   var p; try{ p=JSON.parse(localStorage.getItem('taxil-profile')); }catch(e){}
   if(!p) return;
+  // show active-profile banner
+  var bn=document.getElementById('activeBanner');
+  if(bn){
+    bn.style.display='flex';
+    var nm=(p.name||'').trim();
+    document.getElementById('abName').textContent = nm ? ('שלום '+nm+' — הפרופיל שלך פעיל') : 'הפרופיל שלך פעיל';
+    var prof=(p.professionLabel||'').trim();
+    var biz=p.biz==='osek_morshe'?'עוסק מורשה':'עוסק פטור';
+    document.getElementById('abSub').textContent = (prof? prof+' · ':'')+biz+' · ערוך למטה או המשך לדשבורד';
+  }
   if(p.name) document.getElementById('fName').value=p.name;
   if(p.birthYear) document.getElementById('fBirth').value=p.birthYear;
   if(p.gender){ var g=document.querySelector('input[name="gender"][value="'+p.gender+'"]'); if(g) g.checked=true; }

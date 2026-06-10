@@ -1002,6 +1002,19 @@ function recalc(){
   if(btn) btn.addEventListener('click', function(){ apply(root.getAttribute('data-theme')==='light' ? 'dark' : 'light'); });
 })();
 
+/* adapt CTAs if a profile already exists (returning user) */
+(function(){
+  var p; try{ p=JSON.parse(localStorage.getItem('taxil-profile')); }catch(e){}
+  if(!p) return;
+  var name=(p.name||'').trim();
+  // nav primary button → dashboard
+  var navBtn=document.querySelector('.nav-cta .btn-primary');
+  if(navBtn){ navBtn.setAttribute('href','app.html'); navBtn.textContent = name ? ('שלום '+name.split(' ')[0]+' ←') : 'לדשבורד ←'; }
+  // hero ghost button (בנה את הפרופיל) → continue profile, relabel
+  var ghost=document.querySelector('.hero-cta .btn-ghost');
+  if(ghost){ ghost.setAttribute('href','profile.html'); ghost.innerHTML='המשך את הפרופיל שלי <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>'; }
+})();
+
 /* close mobile menu on link click */
 document.querySelectorAll('#navLinks a').forEach(function(a){
   a.addEventListener('click', function(){ document.getElementById('navLinks').classList.remove('open'); document.querySelector('.menu-btn').setAttribute('aria-expanded','false'); });
