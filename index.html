@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Taxil — רואה החשבון האוטומטי לעצמאי הישראלי</title>
+<meta name="description" content="צלם חשבונית, וה-AI מסווג, מחשב מע״מ ומס הכנסה לפי חוקי 2026 ומכין דיווח. ניהול מס שלם לפרילנסר ולעצמאי בישראל — במקום אחד." />
+<meta name="theme-color" content="#0B1120" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Taxil — המיסים שלך, פשוט מסתדרים" />
+<meta property="og:description" content="AI שמסווג חשבוניות, מחשב מע״מ ומס הכנסה לפי חוקי 2026, ומכין דיווח. כל ניהול המס של העצמאי הישראלי במקום אחד." />
+<meta property="og:locale" content="he_IL" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Taxil",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web, iOS, Android",
+  "description": "רואה החשבון האוטומטי לעצמאי הישראלי — OCR חשבוניות, מחשבון מע״מ ומס הכנסה לפי חוקי 2026, מקדמות ודיווח.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "ILS" },
+  "inLanguage": "he-IL"
+}
+</script>
+
+<style>
+/* ============================================================
+   TAXIL — Precision dark-mode fintech.
+   System: deep slate canvas, single emerald-silver accent,
+   tabular numerals, restrained motion. No purple. No noise.
+   ============================================================ */
+
+:root {
+  /* Canvas — deep, not pure black (avoids OLED smear) */
+  --bg:          #0B1120;
+  --bg-2:        #0E162A;
+  --surface:     #131C30;
+  --surface-2:   #18233C;
+  --border:      #243049;
+  --border-soft: #1B2540;
+
+  /* Single accent: emerald-silver = money + trust */
+  --accent:      #2FE6A8;
+  --accent-2:    #14B884;
+  --accent-deep: #0E7A57;
+  --accent-glow: rgba(47, 230, 168, 0.14);
+
+  /* Text */
+  --fg:          #F4F8FF;
+  --fg-muted:    #9FB0C9;
+  --fg-dim:      #61728E;
+
+  /* States */
+  --danger:      #F87171;
+  --warn:        #FBBF24;
+
+  --radius:      18px;
+  --radius-sm:   12px;
+  --maxw:        1180px;
+
+  --font-he: "Heebo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-num: "Inter", "Heebo", sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-he);
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* Numbers / currency: tabular, Inter for crisp figures */
+.num {
+  font-family: var(--font-num);
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+/* ---------- Ambient background field ---------- */
+.field {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(900px 600px at 85% -5%, rgba(47,230,168,0.10), transparent 60%),
+    radial-gradient(800px 700px at 5% 25%, rgba(20,184,132,0.07), transparent 55%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+}
+.grid-overlay {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-image:
+    linear-gradient(var(--border-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-soft) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(1000px 700px at 80% 0%, #000 0%, transparent 70%);
+          mask-image: radial-gradient(1000px 700px at 80% 0%, #000 0%, transparent 70%);
+  opacity: 0.5;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-family: var(--font-he); font-weight: 600; font-size: 15px;
+  padding: 13px 24px; border-radius: var(--radius-sm);
+  cursor: pointer; border: 1px solid transparent;
+  transition: transform .18s cubic-bezier(.16,1,.3,1), box-shadow .18s, background .18s, border-color .18s;
+  white-space: nowrap;
+}
+.btn svg { width: 18px; height: 18px; }
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  color: #04231A;
+  box-shadow: 0 1px 0 rgba(255,255,255,.25) inset, 0 8px 26px -8px var(--accent-glow);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 1px 0 rgba(255,255,255,.3) inset, 0 14px 38px -10px rgba(47,230,168,.4); }
+.btn-primary:active { transform: translateY(0); }
+.btn-ghost {
+  background: var(--surface);
+  color: var(--fg);
+  border-color: var(--border);
+}
+.btn-ghost:hover { background: var(--surface-2); border-color: var(--accent-deep); transform: translateY(-2px); }
+.btn-lg { padding: 16px 30px; font-size: 16px; }
+
+/* ---------- Pills ---------- */
+.pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 14px; border-radius: 999px;
+  font-size: 13px; font-weight: 600;
+  background: rgba(47,230,168,0.08);
+  color: var(--accent);
+  border: 1px solid rgba(47,230,168,0.2);
+}
+.pill svg { width: 14px; height: 14px; }
+.pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px rgba(47,230,168,.18); animation: livePulse 2.4s ease-in-out infinite; }
+@keyframes livePulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+/* ---------- Nav ---------- */
+header.nav {
+  position: sticky; top: 0; z-index: 50;
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  background: rgba(11,17,32,0.72);
+  border-bottom: 1px solid var(--border-soft);
+}
+.nav-inner { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+.brand { display: flex; align-items: center; gap: 11px; font-weight: 800; font-size: 21px; letter-spacing: -0.02em; }
+.brand .logo {
+  width: 38px; height: 38px; border-radius: 11px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  display: grid; place-items: center;
+  box-shadow: 0 6px 18px -6px var(--accent-glow);
+}
+.brand .logo svg { width: 21px; height: 21px; color: #04231A; }
+.nav-links { display: flex; align-items: center; gap: 30px; }
+.nav-links a.lnk { color: var(--fg-muted); font-weight: 500; font-size: 15px; transition: color .15s; }
+.nav-links a.lnk:hover { color: var(--fg); }
+.nav-cta { display: flex; align-items: center; gap: 12px; }
+
+/* ---------- Hero ---------- */
+.hero { padding: 86px 0 70px; position: relative; }
+.hero-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center; }
+.hero h1 {
+  font-size: clamp(40px, 6vw, 70px);
+  font-weight: 900; line-height: 1.04; letter-spacing: -0.03em;
+  margin: 22px 0 20px;
+}
+.hero h1 .accent {
+  background: linear-gradient(120deg, var(--accent) 0%, #7CF2CE 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero p.lead { font-size: clamp(17px, 2vw, 20px); color: var(--fg-muted); max-width: 540px; line-height: 1.65; }
+.hero p.lead strong { color: var(--fg); font-weight: 600; }
+.hero-cta { display: flex; gap: 14px; margin: 34px 0 26px; flex-wrap: wrap; }
+.trust-row { display: flex; flex-wrap: wrap; gap: 10px 22px; color: var(--fg-dim); font-size: 14px; }
+.trust-row span { display: inline-flex; align-items: center; gap: 7px; }
+.trust-row svg { width: 16px; height: 16px; color: var(--accent); }
+
+/* ---------- Hero dashboard mock ---------- */
+.mock {
+  background: linear-gradient(165deg, var(--surface) 0%, var(--bg-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 22px;
+  box-shadow: 0 40px 90px -40px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.02) inset;
+  position: relative;
+  animation: floaty 7s ease-in-out infinite;
+}
+@keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+.mock-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.mock-head .ttl { font-weight: 700; font-size: 15px; color: var(--fg-muted); }
+.mock-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.stat {
+  background: var(--bg); border: 1px solid var(--border-soft);
+  border-radius: 14px; padding: 16px;
+}
+.stat .lbl { font-size: 12.5px; color: var(--fg-dim); margin-bottom: 7px; display: flex; align-items: center; gap: 6px; }
+.stat .lbl svg { width: 15px; height: 15px; color: var(--accent); }
+.stat .val { font-size: 25px; font-weight: 700; }
+.stat .delta { font-size: 12.5px; font-weight: 600; margin-top: 4px; }
+.stat .delta.up { color: var(--accent); }
+.stat .delta.neutral { color: var(--fg-dim); }
+.mock-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--bg); border: 1px solid var(--border-soft);
+  border-radius: 12px; padding: 12px 14px; margin-top: 10px;
+}
+.mock-row .ic { width: 34px; height: 34px; border-radius: 9px; background: rgba(47,230,168,.1); display: grid; place-items: center; flex-shrink: 0; }
+.mock-row .ic svg { width: 17px; height: 17px; color: var(--accent); }
+.mock-row .meta { flex: 1; min-width: 0; }
+.mock-row .meta .t { font-size: 14px; font-weight: 600; }
+.mock-row .meta .s { font-size: 12px; color: var(--fg-dim); }
+.mock-row .amt { font-weight: 700; font-size: 15px; }
+.mock-row .tag { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: rgba(47,230,168,.1); color: var(--accent); }
+
+/* ---------- Logos / proof strip ---------- */
+.proof { padding: 30px 0; border-block: 1px solid var(--border-soft); }
+.proof-inner { display: flex; align-items: center; justify-content: center; gap: 14px 44px; flex-wrap: wrap; color: var(--fg-dim); font-size: 14px; font-weight: 500; }
+.proof-inner b { color: var(--fg-muted); }
+.proof-inner .sep { width: 4px; height: 4px; border-radius: 50%; background: var(--border); }
+
+/* ---------- Section scaffolding ---------- */
+.section { padding: 96px 0; }
+.sec-head { text-align: center; max-width: 680px; margin: 0 auto 56px; }
+.sec-head h2 { font-size: clamp(30px, 4.4vw, 46px); font-weight: 900; letter-spacing: -0.025em; line-height: 1.12; margin: 16px 0 14px; }
+.sec-head p { font-size: 18px; color: var(--fg-muted); }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--accent); text-transform: uppercase; }
+.eyebrow svg { width: 15px; height: 15px; }
+
+/* ---------- Features ---------- */
+.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.feat {
+  background: linear-gradient(165deg, var(--surface) 0%, var(--bg-2) 100%);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 30px 26px;
+  transition: transform .25s cubic-bezier(.16,1,.3,1), border-color .25s, box-shadow .25s;
+}
+.feat:hover { transform: translateY(-5px); border-color: var(--accent-deep); box-shadow: 0 26px 50px -28px rgba(0,0,0,.7); }
+.feat .ficon {
+  width: 50px; height: 50px; border-radius: 13px;
+  background: rgba(47,230,168,.1); border: 1px solid rgba(47,230,168,.18);
+  display: grid; place-items: center; margin-bottom: 18px;
+}
+.feat .ficon svg { width: 23px; height: 23px; color: var(--accent); }
+.feat h3 { font-size: 19px; font-weight: 700; margin-bottom: 9px; letter-spacing: -0.01em; }
+.feat p { font-size: 15px; color: var(--fg-muted); line-height: 1.62; }
+
+/* ---------- How it works ---------- */
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; position: relative; }
+.step {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 32px 26px; position: relative;
+}
+.step .n {
+  position: absolute; top: -16px; inset-inline-start: 26px;
+  width: 38px; height: 38px; border-radius: 11px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  color: #04231A; font-weight: 800; font-size: 17px;
+  display: grid; place-items: center;
+  font-family: var(--font-num);
+  box-shadow: 0 8px 20px -8px var(--accent-glow);
+}
+.step h3 { font-size: 19px; font-weight: 700; margin: 18px 0 9px; }
+.step p { font-size: 15px; color: var(--fg-muted); line-height: 1.62; }
+
+/* ---------- Tax engine highlight ---------- */
+.engine { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; }
+.engine .copy h2 { font-size: clamp(28px, 4vw, 42px); font-weight: 900; letter-spacing: -0.025em; line-height: 1.14; margin: 16px 0 16px; }
+.engine .copy p { font-size: 17px; color: var(--fg-muted); margin-bottom: 22px; }
+.engine ul { list-style: none; display: flex; flex-direction: column; gap: 13px; }
+.engine li { display: flex; align-items: flex-start; gap: 12px; font-size: 16px; }
+.engine li svg { width: 22px; height: 22px; color: var(--accent); flex-shrink: 0; margin-top: 2px; }
+.engine li b { color: var(--fg); font-weight: 600; }
+.bracket-card {
+  background: linear-gradient(165deg, var(--surface) 0%, var(--bg-2) 100%);
+  border: 1px solid var(--border); border-radius: 22px; padding: 28px;
+  box-shadow: 0 40px 80px -44px rgba(0,0,0,.7);
+}
+.bracket-card .bc-head { display:flex; align-items:center; justify-content:space-between; margin-bottom: 20px; }
+.bracket-card .bc-head .t { font-weight: 700; font-size: 15px; }
+.bracket-card .bc-head .y { font-size: 13px; color: var(--accent); font-weight: 600; }
+.bar-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.bar-row .pct { width: 44px; font-family: var(--font-num); font-weight: 600; font-size: 14px; color: var(--fg-muted); text-align: end; }
+.bar-track { flex: 1; height: 11px; background: var(--bg); border-radius: 999px; overflow: hidden; border: 1px solid var(--border-soft); }
+.bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent-deep), var(--accent)); }
+.bc-foot { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border-soft); display:flex; justify-content: space-between; align-items: center; }
+.bc-foot .lbl { font-size: 13px; color: var(--fg-dim); }
+.bc-foot .big { font-size: 27px; font-weight: 800; }
+
+/* ---------- CTA band ---------- */
+.cta-band {
+  position: relative; overflow: hidden;
+  border-radius: 28px;
+  background: linear-gradient(150deg, var(--accent-deep) 0%, #0a3f30 55%, var(--bg-2) 100%);
+  border: 1px solid var(--accent-deep);
+  padding: 70px 40px; text-align: center;
+}
+.cta-band::before { content:""; position:absolute; top:-40%; inset-inline-end:-10%; width:420px; height:420px; background: radial-gradient(circle, rgba(47,230,168,.22), transparent 65%); }
+.cta-band h2 { font-size: clamp(28px, 4.6vw, 46px); font-weight: 900; letter-spacing: -0.025em; line-height: 1.12; margin-bottom: 16px; position: relative; }
+.cta-band p { font-size: 18px; color: rgba(244,248,255,.82); max-width: 540px; margin: 0 auto 30px; position: relative; }
+.cta-band .btn-primary { background: var(--fg); color: var(--bg); }
+.cta-band .btn-primary:hover { background: #fff; }
+
+/* ---------- Footer ---------- */
+footer.foot { border-top: 1px solid var(--border-soft); padding: 44px 0 36px; margin-top: 30px; }
+.foot-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.foot .brand { font-size: 18px; }
+.foot .brand .logo { width: 32px; height: 32px; }
+.foot .brand .logo svg { width: 18px; height: 18px; }
+.foot-meta { color: var(--fg-dim); font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.foot-meta svg { width: 16px; height: 16px; color: var(--accent); }
+.foot-legal { color: var(--fg-dim); font-size: 13px; }
+.disclaimer { text-align: center; color: var(--fg-dim); font-size: 12.5px; margin-top: 22px; max-width: 760px; margin-inline: auto; line-height: 1.6; }
+
+/* ---------- Reveal animation ---------- */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity .7s ease, transform .7s cubic-bezier(.16,1,.3,1); }
+.reveal.in { opacity: 1; transform: none; }
+
+/* ---------- Mobile nav toggle ---------- */
+.menu-btn { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; width: 42px; height: 42px; place-items: center; cursor: pointer; }
+.menu-btn svg { width: 22px; height: 22px; color: var(--fg); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 940px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 44px; }
+  .hero .mock { max-width: 480px; }
+  .features { grid-template-columns: 1fr 1fr; }
+  .engine { grid-template-columns: 1fr; gap: 36px; }
+}
+@media (max-width: 760px) {
+  .nav-links { display: none; }
+  .menu-btn { display: grid; }
+  .hero { padding: 54px 0 50px; }
+  .section { padding: 68px 0; }
+  .features { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; gap: 30px; }
+  .step { padding-top: 36px; }
+  .cta-band { padding: 50px 24px; }
+  .foot-inner { flex-direction: column; text-align: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1; transform: none; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="field" aria-hidden="true"></div>
+<div class="grid-overlay" aria-hidden="true"></div>
+
+<!-- ============ NAV ============ -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a href="#" class="brand" aria-label="Taxil — דף הבית">
+      <span class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      </span>
+      Taxil
+    </a>
+    <nav class="nav-links" aria-label="ניווט ראשי">
+      <a class="lnk" href="#features">יכולות</a>
+      <a class="lnk" href="#how">איך זה עובד</a>
+      <a class="lnk" href="#engine">מנוע המס</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="lnk" href="#" style="font-weight:600;">התחבר</a>
+      <a class="btn btn-primary" href="#cta">התחל בחינם</a>
+    </div>
+    <button class="menu-btn" aria-label="תפריט" onclick="document.querySelector('.nav-links').style.display='flex';this.style.display='none';">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="pill"><span class="dot" aria-hidden="true"></span> בנוי לחוקי המס של 2026</span>
+      <h1>המיסים שלך,<br><span class="accent">פשוט מסתדרים.</span></h1>
+      <p class="lead">
+        צלם חשבונית. <strong>ה‑AI מסווג אותה, מחשב מע״מ ומס הכנסה, ומכין דיווח.</strong>
+        כל מה שעצמאי ופרילנסר בישראל צריך כדי לנהל מס — במקום אחד, בלי שכר טרחה.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-lg" href="#cta">
+          התחל בחינם
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </a>
+        <a class="btn btn-ghost btn-lg" href="#how">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          צפה בדמו
+        </a>
+      </div>
+      <div class="trust-row">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ללא כרטיס אשראי</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> הצפנה מלאה</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> מותאם לישראל בלבד</span>
+      </div>
+    </div>
+
+    <!-- Dashboard mock -->
+    <div class="mock" role="img" aria-label="תצוגה מקדימה של לוח הבקרה של Taxil עם סיכום מע״מ, חשבוניות ומקדמה">
+      <div class="mock-head">
+        <span class="ttl">לוח בקרה · יוני 2026</span>
+        <span class="pill" style="font-size:11px;padding:4px 10px;"><span class="dot" aria-hidden="true"></span> חי</span>
+      </div>
+      <div class="mock-stats">
+        <div class="stat">
+          <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> מע״מ צפוי</div>
+          <div class="val num">₪3,420</div>
+          <div class="delta up">12%‑ מהחודש שעבר</div>
+        </div>
+        <div class="stat">
+          <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> חשבוניות</div>
+          <div class="val num">42</div>
+          <div class="delta up">8+ החודש</div>
+        </div>
+      </div>
+      <div class="stat" style="margin-bottom:4px;">
+        <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> מקדמת מס הבאה</div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;">
+          <div class="val num">₪1,250</div>
+          <div class="delta neutral">לתשלום ב‑15/07</div>
+        </div>
+      </div>
+      <div class="mock-row">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
+        <div class="meta"><div class="t">חשבונית — דלק פז</div><div class="s">סווג אוטומטית · הכרה 100%</div></div>
+        <span class="tag">עובד עצמאי</span>
+        <span class="amt num">₪340</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROOF STRIP ============ -->
+<div class="proof">
+  <div class="wrap proof-inner">
+    <span>מותאם ל<b>עוסק פטור</b> ול<b>עוסק מורשה</b></span>
+    <span class="sep" aria-hidden="true"></span>
+    <span>מנוע מס <b>2026</b></span>
+    <span class="sep" aria-hidden="true"></span>
+    <span>OCR מבית <b>Claude Vision</b></span>
+    <span class="sep" aria-hidden="true"></span>
+    <span>עברית מלאה <b>RTL</b></span>
+  </div>
+</div>
+
+<!-- ============ FEATURES ============ -->
+<section class="section" id="features">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> מה Taxil עושה</span>
+      <h2>שלוש דקות במקום שלוש שעות.</h2>
+      <p>במקום לצבור קבלות בקופסת נעליים ולשלם שכר טרחה — תן לאוטומציה לעשות את העבודה המשעממת.</p>
+    </div>
+    <div class="features">
+      <div class="feat reveal">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v1a3 3 0 0 0-3 3 3 3 0 0 0 0 6 3 3 0 0 0 3 3v1a3 3 0 0 0 6 0v-1a3 3 0 0 0 3-3 3 3 0 0 0 0-6 3 3 0 0 0-3-3V5a3 3 0 0 0-3-3z"/></svg></div>
+        <h3>AI מסווג חשבוניות</h3>
+        <p>צלם או העלה — Claude Vision מזהה ספק, סכום, מע״מ וח״פ, ומסווג לקטגוריה הנכונה תוך שניות.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="18"/><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01"/></svg></div>
+        <h3>מנוע מס מדויק</h3>
+        <p>מדרגות מס הכנסה 2026, נקודות זיכוי, ביטוח לאומי ומע״מ — מחושבים נכון, אוטומטית, בכל רגע.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <h3>הכרה אוטומטית בהוצאות</h3>
+        <p>המערכת יודעת ש‑100% מוכר על ציוד ו‑50% על ארוחה עם לקוח — לפי סוג העסק שלך. בלי לנחש.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div>
+        <h3>דיווח 6111 מוכן</h3>
+        <p>בלחיצה אחת — דוח שנתי וטופס 6111 מוכנים לעלות לרשות המסים. בלי גיליונות אקסל ידניים.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <h3>תזכורות מקדמות</h3>
+        <p>לפני כל מקדמה דו‑חודשית או דיווח מע״מ — תזכורת חכמה עם הסכום המדויק והדדליין הבא.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <h3>הנתונים שלך, מוצפנים</h3>
+        <p>הצפנה מקצה לקצה. רק אתה ניגש לנתונים. ייצוא מלא בכל רגע — אפס נעילה לספק.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="section" id="how" style="background:linear-gradient(180deg, transparent, rgba(20,184,132,.04), transparent);">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> איך זה עובד</span>
+      <h2>שלושה שלבים. זהו.</h2>
+      <p>מהחשבונית ועד הדוח המוכן — בלי ידע חשבונאי, בלי גיליונות.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <span class="n num">1</span>
+        <h3>צלם חשבונית</h3>
+        <p>או העלה PDF / תמונה. ה‑AI קורא ומחלץ את כל הנתונים תוך שניות ספורות.</p>
+      </div>
+      <div class="step reveal">
+        <span class="n num">2</span>
+        <h3>אשר את הסיווג</h3>
+        <p>המערכת מציעה קטגוריה ואחוז הכרה. אישור בלחיצה — או עריכה, לבחירתך.</p>
+      </div>
+      <div class="step reveal">
+        <span class="n num">3</span>
+        <h3>הדוחות מוכנים</h3>
+        <p>כל החישובים מתעדכנים אוטומטית. מע״מ, מס ומקדמות — מוכנים לדיווח.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TAX ENGINE HIGHLIGHT ============ -->
+<section class="section" id="engine">
+  <div class="wrap engine">
+    <div class="copy reveal">
+      <span class="eyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v4H4zM4 12h10v8H4zM18 12h2v8h-2z"/></svg> מנוע המס</span>
+      <h2>חישוב מס שאתה יכול לסמוך עליו.</h2>
+      <p>מנוע פנימי הבנוי על חוקי המס של ישראל לשנת 2026 — לא קירוב גנרי, אלא חישוב שמתאים בדיוק לסטטוס שלך.</p>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>מדרגות מס הכנסה 2026</b> — מ‑10% ועד 50%, כולל ביטוח לאומי ובריאות.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>נקודות זיכוי</b> — מחושבות לפי מצב משפחתי, ילדים וסטטוס מיוחד.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>מע״מ עוסק פטור / מורשה</b> — עסקאות מינוס תשומות, אוטומטי.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>מקדמות דו‑חודשיות</b> — סכום ודדליין מדויקים, מראש.</span></li>
+      </ul>
+    </div>
+    <div class="bracket-card reveal" role="img" aria-label="המחשה של מדרגות מס הכנסה לשנת 2026 וחבות מס משוערת">
+      <div class="bc-head">
+        <span class="t">מדרגות מס הכנסה</span>
+        <span class="y">2026</span>
+      </div>
+      <div class="bar-row"><span class="pct num">10%</span><div class="bar-track"><div class="bar-fill" style="width:20%"></div></div></div>
+      <div class="bar-row"><span class="pct num">14%</span><div class="bar-track"><div class="bar-fill" style="width:28%"></div></div></div>
+      <div class="bar-row"><span class="pct num">20%</span><div class="bar-track"><div class="bar-fill" style="width:40%"></div></div></div>
+      <div class="bar-row"><span class="pct num">31%</span><div class="bar-track"><div class="bar-fill" style="width:62%"></div></div></div>
+      <div class="bar-row"><span class="pct num">35%</span><div class="bar-track"><div class="bar-fill" style="width:70%"></div></div></div>
+      <div class="bar-row"><span class="pct num">47%</span><div class="bar-track"><div class="bar-fill" style="width:94%"></div></div></div>
+      <div class="bc-foot">
+        <span class="lbl">חבות מס משוערת לשנה</span>
+        <span class="big num">₪18,640</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA BAND ============ -->
+<section class="section" id="cta" style="padding-top:30px;">
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <h2>סיים עם החודש הזה.<br>תתחיל את הבא בנקי.</h2>
+      <p>הצטרף ל‑Taxil, תעיף את ה‑Excel של הקבלות, ותן למיסים פשוט להסתדר.</p>
+      <a class="btn btn-primary btn-lg" href="#" style="position:relative;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        התחל בחינם — ללא כרטיס אשראי
+      </a>
+    </div>
+    <p class="disclaimer">
+      Taxil מספקת חישוב מקורב למטרות תכנון בלבד. לחישוב סופי ולדיווח רשמי לרשויות המס יש להיוועץ ברואה חשבון מוסמך.
+    </p>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-inner">
+      <a href="#" class="brand">
+        <span class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </span>
+        Taxil
+      </a>
+      <div class="foot-meta">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        הצפנה ופרטיות מלאה
+      </div>
+      <div class="foot-legal">© 2026 Taxil · רואה החשבון האוטומטי שלך</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal — restrained, respects reduced-motion (CSS handles that)
+(function () {
+  var els = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) { els.forEach(function(e){e.classList.add('in');}); return; }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  }, { threshold: 0.12 });
+  els.forEach(function (e) { io.observe(e); });
+})();
+</script>
+
+</body>
+</html>
